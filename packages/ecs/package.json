@@ -1,0 +1,55 @@
+{
+  "name": "@bim/ecs",
+  "author": "Etat de Genève",
+  "description": "Typescript ECS library implementation",
+  "keywords": [
+    "ECS",
+    "Game engine",
+    "typescript",
+    "javascript",
+    "BIM"
+  ],
+  "private": false,
+  "version": "0.0.0",
+  "type": "module",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    },
+    "./resources": {
+      "import": "./dist/resources/index.js"
+    },
+    "./systems": {
+      "import": "./dist/systems/index.js"
+    },
+    "./event-bus": {
+      "import": "./dist/event-bus/index.js"
+    },
+    "./scheduling": {
+      "import": "./dist/scheduling/index.js"
+    },
+    "./components": {
+      "import": "./dist/components/index.js"
+    },
+    "./entities": {
+      "import": "./dist/entities/index.js"
+    }
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^22.9.0",
+    "typescript": "~5.6.2",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4",
+    "vite-plugin-dts": "^4.3.0",
+    "jsdom": "^24.1.0",
+    "glob": "11.0.0"
+  },
+  "dependencies": {
+    "@bim/iterable": "^0.0.0"
+  }
+}

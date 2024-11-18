@@ -1,0 +1,8 @@
+{
+  "manifest_version": 3,
+  "name": "Mermaid Graph Viewer",
+  "version": "1.0",
+  "description": "Displays Mermaid flowchart from window.__ecs_debug",
+  "permissions": ["activeTab", "scripting"],
+  "devtools_page": "devtools.html"
+}

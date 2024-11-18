@@ -1,0 +1,20 @@
+{
+  "name": "@bim/ecs-akanoid",
+  "version": "0.0.0",
+  "description": "A demo project with BIM ECS implementing Arkanoid",
+  "main": "index.js",
+  "type": "module",
+  "private": "true",
+  "scripts": {
+    "start": "vite"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@bim/ecs": "0.0.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.6.2",
+    "vite": "^5.4.10"
+  }
+}

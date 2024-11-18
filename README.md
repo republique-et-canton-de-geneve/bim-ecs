@@ -20,19 +20,25 @@ Systems parallelization
 > Generally speaking, systems runtime is not critical for the project this ECS implementation has been written for. However, some
 > optimizations in the implementation are highly possible seamlessly without being counter-productive toward the original purposes.
 
-## ECS Structure
+## Structure overview
+
+ECS implements a world, hosting Entities, Components and systems.  
+Entities are fetched from world with queries.  
+Additional features such as `Resources`, `Scheduler`, `EventBus` adds convenient mechanisms to interact with the world (according to dedicated finality)
 
 ```mermaid
 flowchart LR
 
-    World(("World"))-->Entities
-    World-->Components[["Components"]]
-    World-->Systems[["Systems"]]
-    World-->Queries[["Queries"]]
-    Components-->Entities[["Entities"]]
-    Scheduler-->EventBus
-    Systems-->Scheduler
-    Systems-->Resources
+    World(("World"))---Entities
+    World---Components[["Components"]]
+    Components-.-Entities[["Entities"]]
+    World---Systems[["Systems"]]
+    World----Resources(["Resources"])
+    Systems-.-Resources
+    Systems-.-Queries(["Queries"])
+    Systems-.-Schedulers(["Schedulers"])
+    Schedulers -.- EventBus(["EventBus"])
+    Systems -.- EventBus(["EventBus"])
 ```
 
 **Show me the code :**

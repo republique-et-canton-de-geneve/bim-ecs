@@ -8,8 +8,8 @@
   "scripts": {
     "start": "vite"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Etat de Genève",
+  "license": "Apache-2.0",
   "dependencies": {
     "@bim/ecs": "0.0.0"
   },

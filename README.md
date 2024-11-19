@@ -215,11 +215,16 @@ world.entities.addComponentToEntity(
 
 // TODO finalize implementation
 
-> Important current limitation: The current ECS implementation cannot handle more than 32 components.  
-> To maximize performance, queries use bit-masking onto `Uint32` values. A possible evolution could be
-> to allocate masks through `UInt32Array`. However, this would increase complexity and possibly reduce performance.
->
-> To be evaluated...
+ECS components inherit `EcsComponent<TValue>` class or derived. There are basically 3 kind of base classes provided by the library:
+* `EcsComponent<TValue>` (with `TValue = void` by default) stands for an immutable component
+* `EcsMutableComponent<TValue>` (with mandatory `TValue`) stands for a component with a mutable value. This mutation can be used to schedule systems handling this mutation for instance (WIP)
+* `EcsIndexedComponent<TValue>` (with mandatory `TValue`) stands for a component with an immutable value which can be used in queries (WIP)
+
+> Important current limitation: The current ECS implementation can handle a limited combinations of archetypes.
+> Combinations are using bits masking through `UInt32Array`. The size of these arrays are fix for now and may be dynamic in the future.
+> Queries performance is directly impacted by the size of this array. For now, default size is pretty bix (about 16 / 32 combinations).  
+> A config parameter should at least be exposed in world construction.  
+> To be finalized...
 
 ## Querying
 

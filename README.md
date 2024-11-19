@@ -2,17 +2,17 @@
 
 (From Wikipedia) Entity–component–system (ECS) is a software architectural pattern mostly used in video game development for the representation of game world objects. An ECS comprises entities composed from components of data, with systems which operate on the components.
 
-> Warning: This library is still under heaver development. Entities/components implementation are still needed to be finalized
+> **Warning:** This library is still under heavy development.
 
 ## What this ECS implementation is designed for :
   - Modularisation
-  - Entities querying on large amount of data (byteECS is doing a very nice job on this but doesn't have required feature + component values cannot be strings)
+  - Entities querying on a large amount of data (byteECS is doing a very nice job on this but doesn't have required feature + component values cannot be strings)
   - Components value indexing (WIP)
   - Advanced systems scheduling
 
 ## What this ECS implementation is NOT designed for :
-The architecture of this project has been built as a requirement for the BIM project at "Etat de Genève". This means some feature are required, others are nice to have, and some
-are unwanted, because readability is more important than performances and vice versa.
+The architecture of this project has been built as a requirement for the BIM project at "Etat de Genève". This means some features are required, others are nice to have, and some
+are unwanted, because readability may be more important than performances in some cases and vice versa.
 
 **Example :**
 Systems parallelization
@@ -154,11 +154,11 @@ This creates 2 entities within the world
 
 ```typescript
 import { EcsWorld } from './ecs-world'
-import { Component } from './component'
+import { EcsComponent } from './component'
 
-class PersonComponent extends Component {}
-class AnimalComponent extends Component {}
-class NameComponent extends Component<string> {}
+class PersonComponent extends EcsComponent {}
+class AnimalComponent extends EcsComponent {}
+class NameComponent extends EcsComponent<string> {}
 
 const world = new EcsWorld()
 world.entities.spawn(new PersonComponent(), new NameComponent('Bob'))
@@ -171,11 +171,11 @@ This creates 2 entities within the world and removes foxy
 
 ```typescript
 import { EcsWorld } from './ecs-world'
-import { Component } from './component'
+import { EcsComponent } from './component'
 
-class PersonComponent extends Component {}
-class AnimalComponent extends Component {}
-class NameComponent extends Component<string> {}
+class PersonComponent extends EcsComponent {}
+class AnimalComponent extends EcsComponent {}
+class NameComponent extends EcsComponent<string> {}
 
 const world = new EcsWorld()
 world.entities.spawn(new PersonComponent(), new NameComponent('Bob'))
@@ -192,11 +192,11 @@ This transforms foxy into a person
 
 ```typescript
 import { EcsWorld } from './ecs-world'
-import { Component } from './component'
+import { EcsComponent } from './component'
 
-class PersonComponent extends Component {}
-class AnimalComponent extends Component {}
-class NameComponent extends Component<string> {}
+class PersonComponent extends EcsComponent {}
+class AnimalComponent extends EcsComponent {}
+class NameComponent extends EcsComponent<string> {}
 
 const world = new EcsWorld()
 world.entities.spawn(new PersonComponent(), new NameComponent('Bob'))
@@ -232,15 +232,15 @@ ECS components inherit `EcsComponent<TValue>` class or derived. There are basica
 
 ```typescript
 import { EcsWorld } from './ecs-world'
-import { Component } from './component'
+import { EcsComponent } from './component'
 import { defineQuery } from './define-query'
 
 const world = new EcsWorld()
 
 // Components
-class PersonComponent extends Component {}
-class AnnimalComponent extends Component {}
-class NameComponent extends Component<string> {}
+class PersonComponent extends EcsComponent {}
+class AnnimalComponent extends EcsComponent {}
+class NameComponent extends EcsComponent<string> {}
 
 // Entities
 world.entities.spawn(new PersonComponent(), new NameComponent('Bob'))

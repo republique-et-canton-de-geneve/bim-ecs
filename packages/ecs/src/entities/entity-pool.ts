@@ -1,5 +1,5 @@
 import type { EntityId } from './entity-id';
-import type { EcsComponent } from '../components';
+import type { EcsComponent, EcsComponentCtor } from '../components';
 import { EcsWorld } from '../world';
 import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from './entities-events';
 import { ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED } from '../components/ecs-component-events.ts';
@@ -51,7 +51,22 @@ export class EntityPool {
   public componentsOf(entityId: EntityId) {
     return new Map(
       map(this.componentsByEntity.get(entityId) ?? [], (component) => [component.constructor, component] as [typeof EcsComponent<any>, EcsComponent<any>]),
-    );
+    ) as {
+      /**
+       * Gets the component instance
+       * @param componentType The component type
+       */
+      get<TComponent extends EcsComponent<TValue>, TValue>(componentType: EcsComponentCtor<TComponent, TValue>): TComponent | undefined
+
+      /**
+       * Determines whether the entity contains the component from its type
+       * @param componentType The component type
+       */
+      has(componentType: typeof EcsComponent<any>): boolean
+
+      /** Provides the enumeration of ecs component instances */
+      values():Iterable<typeof EcsComponent<any>>
+    };
   }
 
   /**

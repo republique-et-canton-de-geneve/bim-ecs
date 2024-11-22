@@ -13,5 +13,6 @@ export class Config extends EcsResource {
   plateWidth = 38;
   plateBallDeviationSensitivity = 1.8;
 
+  /** Cheat mode (useful in dev env) */
   noTrapMode = false;
 }

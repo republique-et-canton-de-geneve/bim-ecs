@@ -4,13 +4,19 @@ import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable }
 import { EcsComponent, EcsComponentCtor } from '../components';
 import { ECS_COMPONENT_LINK_REMOVED } from '../components/ecs-component-events';
 import { EntityId } from '../entities';
+import { QueryDefinition } from '../querying/query-definition';
+import { runAtomicQueryOnSingleEntity } from '../querying/query-processing';
+import { archetypeMaskFor } from '../querying/_archetype/archetype-mask-for';
+import { compileQueryDefinition } from '../querying/compile-query';
 
 /**
  * Schedules execution on ECS component removed
  * @param componentType The component type
+ * @param query Allowed entities
  */
 export function componentRemoved<TValue, TComponent extends EcsComponent<TValue>>(
   componentType: EcsComponentCtor<TComponent, TValue>,
+  query?: QueryDefinition,
 ): SchedulerCtor<{ component: TComponent; entity: EntityId }> {
   return class extends Scheduler<{ component: TComponent; entity: EntityId }> implements Debuggable {
     #resolveNext: ((value: { component: TComponent; entity: EntityId }) => void) | null = null;
@@ -19,7 +25,29 @@ export function componentRemoved<TValue, TComponent extends EcsComponent<TValue>
     readonly #eventPayloadsQueue: { component: TComponent; entity: EntityId }[] = [];
 
     #unsubscribe: Function = this.world.bus.subscribe(ECS_COMPONENT_LINK_REMOVED, (args) => {
-      if (args.component.constructor !== componentType) return;
+      if (
+        // Component type check
+        args.component.constructor !== componentType ||
+        // (Optionally) Query check
+        (query &&
+          !runAtomicQueryOnSingleEntity(
+            {
+              entity: args.entity,
+              componentsMask: archetypeMaskFor(
+                this.world.entities.componentsOf(args.entity).keys(),
+                this.world.query.archetypeCache.counter,
+              ),
+            },
+            compileQueryDefinition(query),
+            {
+              counter: this.world.query.archetypeCache.counter,
+              indexesRepository: this.world.query.indexedComponentsCache.entitiesByComponentValues,
+            },
+          ))
+      ) {
+        return; // Not candidate
+      }
+
       if (this.#resolveNext) {
         // Executing immediately
         this.#resolveNext(args as { component: TComponent; entity: EntityId });

@@ -4,6 +4,7 @@ import { EcsWorld } from '../world';
 import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from './entities-events';
 import { ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED } from '../components/ecs-component-events';
 import { map } from '@bim/iterable';
+import { Archetype } from '../querying/_archetype';
 
 /** Handles ECS entities life cycle */
 export class EntityPool {
@@ -70,7 +71,10 @@ export class EntityPool {
       has(componentType: typeof EcsComponent<any>): boolean;
 
       /** Provides the enumeration of ecs component instances */
-      values(): Iterable<typeof EcsComponent<any>>;
+      values(): Iterable<EcsComponent<any>>;
+
+      /** Provides the enumeration of ecs component types */
+      keys(): Archetype;
     };
   }
 

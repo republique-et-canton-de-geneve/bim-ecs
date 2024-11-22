@@ -28,10 +28,7 @@ export const initializeBallSystem = defineSystem(
         width: config.ballRadius,
         height: config.ballRadius,
       }),
-      new Velocity({
-        x: 2,
-        y: -2,
-      }),
+      new Velocity({ ...config.ballInitialVelocity }),
     );
   },
   startup,

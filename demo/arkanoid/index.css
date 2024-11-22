@@ -22,6 +22,13 @@ h1 {
     border-radius: 4px;
 }
 
+.scene > .score {
+    position: absolute;
+    top: -1.35em;
+    right: 0;
+    font-family: "Silkscreen", sans-serif;
+}
+
 .scene>.brick {
     /*background: #ec2de7;*/
     background: white;

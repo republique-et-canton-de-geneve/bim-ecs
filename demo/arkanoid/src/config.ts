@@ -1,13 +1,17 @@
 import { EcsResource } from '@bim/ecs/resources';
 
 export class Config extends EcsResource {
-  width = 500;
+  width = 600;
   height = 300;
 
-  columns = 10;
+  columns = 12;
   rows = 13;
 
   ballRadius = 8;
+  ballInitialVelocity = {
+    x: 2,
+    y: -2,
+  };
 
   plateHeight = 8;
   plateWidth = 38;

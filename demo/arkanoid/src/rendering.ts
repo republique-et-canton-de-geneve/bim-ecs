@@ -9,6 +9,7 @@ import { Ball, initializeBallSystem, updateBallSystem } from './ball';
 import { Name } from './common';
 import { initializeBricksSystem } from './brick';
 import { entityRemoved } from '@bim/ecs/scheduling';
+import { handleBrickDeletionScoreSystem, ScoreResource } from './score';
 
 export const renderingPlugin: EcsPlugin = (world) => {
   world.registerSystem(initializeSceneSystem);
@@ -16,6 +17,7 @@ export const renderingPlugin: EcsPlugin = (world) => {
   world.registerSystem(initializeBoxGeometriesRenderingSystem);
   world.registerSystem(handleEntityDeletionSystem);
   world.registerSystem(updateBallRenderingSystem);
+  world.registerSystem(updateScoreRenderingSystem);
 };
 
 export class DOMElementComponent extends EcsComponent<HTMLElement> {}
@@ -43,7 +45,7 @@ export const initializeSceneSystem = defineSystem(
 export const initializeBoxGeometriesRenderingSystem = defineSystem(
   'Init Box geometries rendering',
   ({ query, entities }, { payload }) => {
-    const scene = query.execute(() => [SceneComponent]).next().value;
+    const scene = query.execute(() => [SceneComponent]).next().value!;
     const sceneElement = entities.componentsOf(scene).get(DOMElementComponent)!.value;
 
     // const entity = payload.entity; // option A
@@ -110,4 +112,26 @@ export const updateBallRenderingSystem = defineSystem(
     }
   },
   after([updateBallSystem]),
+);
+
+export const updateScoreRenderingSystem = defineSystem(
+  'Rendering score',
+  ({ query, entities, container }) => {
+    const scene = query.execute(() => [SceneComponent, DOMElementComponent]).next().value;
+    if (scene !== undefined) {
+      const scoreResources = container.resolve(ScoreResource);
+      const scoreText = `Score: ${scoreResources.value}`;
+      const sceneElement = entities.componentsOf(scene).get(DOMElementComponent)!.value;
+      const existingScoreElement = sceneElement.querySelector('.score');
+      if (existingScoreElement) {
+        existingScoreElement.textContent = scoreText;
+      } else {
+        const scoreElement = document.createElement('DIV');
+        scoreElement.classList.add('score');
+        sceneElement.appendChild(scoreElement);
+        scoreElement.textContent = scoreText;
+      }
+    }
+  },
+  after(handleBrickDeletionScoreSystem),
 );

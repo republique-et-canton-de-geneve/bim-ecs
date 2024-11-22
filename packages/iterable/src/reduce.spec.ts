@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { reduce } from './reduce.ts'; // Adjust the import path as needed
+import { reduce } from './reduce'; // Adjust the import path as needed
 
 describe('reduce', () => {
   it('should reduce a Set correctly', () => {

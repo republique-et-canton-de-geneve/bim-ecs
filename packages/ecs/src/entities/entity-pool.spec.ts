@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { EventBus } from '../event-bus';
-import { EntityPool } from './entity-pool.ts';
+import { EntityPool } from './entity-pool';
 import { EcsComponent } from '../components';
 
 describe('EntityPool', () => {

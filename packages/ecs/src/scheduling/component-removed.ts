@@ -2,7 +2,7 @@ import { SchedulerCtor } from './scheduler-constructor';
 import { Scheduler } from './scheduler';
 import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../debug';
 import { EcsComponent, EcsComponentCtor } from '../components';
-import { ECS_COMPONENT_LINK_REMOVED } from '../components/ecs-component-events.ts';
+import { ECS_COMPONENT_LINK_REMOVED } from '../components/ecs-component-events';
 import { EntityId } from '../entities';
 
 /**

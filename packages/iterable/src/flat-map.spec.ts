@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { flatMap } from './flat-map.ts';
+import { flatMap } from './flat-map';
 
 describe('flatMap', () => {
   it('should flatten and map the input iterable', () => {

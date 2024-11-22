@@ -1,11 +1,11 @@
-import { ArchetypeMaskMap } from './archetype-mask-map.ts';
-import { EntityId } from '../../entities/entity-id.ts';
-import { archetypeFromComponents, ArchetypeMask } from './archetype.ts';
-import { archetypeMaskFor } from './archetype-mask-for.ts';
-import { ComponentTypeIdFlagCounter } from '../component-type-id-flag-counter.ts';
+import { ArchetypeMaskMap } from './archetype-mask-map';
+import { EntityId } from '../../entities/entity-id';
+import { archetypeFromComponents, ArchetypeMask } from './archetype';
+import { archetypeMaskFor } from './archetype-mask-for';
+import { ComponentTypeIdFlagCounter } from '../component-type-id-flag-counter';
 import { EcsWorld } from '../../world';
-import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from '../../entities/entities-events.ts';
-import { ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED } from '../../components/ecs-component-events.ts';
+import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from '../../entities/entities-events';
+import { ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED } from '../../components/ecs-component-events';
 
 export class ArchetypeCache implements Disposable {
   #disposals = [] as Function[];
@@ -18,7 +18,11 @@ export class ArchetypeCache implements Disposable {
   constructor(private readonly world: Pick<EcsWorld, 'entities' | 'bus'>) {
     this.#disposals.push(world.bus.subscribe(ECS_ENTITY_SPAWNED, ({ entity }) => this.handleAddedEntity(entity)));
     this.#disposals.push(world.bus.subscribe(ECS_ENTITY_REMOVED, ({ entity }) => this.handleRemovedEntity(entity)));
-    this.#disposals.push(world.bus.subscribe([ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED], ({ entity }) => this.handleModifiedEntity(entity)));
+    this.#disposals.push(
+      world.bus.subscribe([ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED], ({ entity }) =>
+        this.handleModifiedEntity(entity),
+      ),
+    );
   }
 
   private handleAddedEntity(entityId: EntityId) {

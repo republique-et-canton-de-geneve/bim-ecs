@@ -1,5 +1,5 @@
 import { EcsMutableComponent } from '@bim/ecs/components';
-import { BoxGeometry } from './box-geometry.ts';
+import { BoxGeometry } from './box-geometry';
 
 export class Velocity extends EcsMutableComponent<{ x: number; y: number }> {
   public invertX() {

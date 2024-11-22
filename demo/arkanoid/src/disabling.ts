@@ -1,7 +1,7 @@
 import { EcsComponent } from '@bim/ecs/components';
 import { defineSystem, EcsPlugin } from '@bim/ecs';
 import { componentAdded } from '@bim/ecs/scheduling';
-import { DOMElementComponent } from './rendering.ts';
+import { DOMElementComponent } from './rendering';
 
 export const disablingPlugin: EcsPlugin = (world) => {
   world.registerSystem(handleDisablingSystem);

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { Archetype } from './archetype';
 import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter';
-import { areArchetypeMatching } from './are-archetype-matching.ts';
+import { areArchetypeMatching } from './are-archetype-matching';
 import { EcsComponent } from '../components';
 
 describe('areArchetypeMatching', () => {

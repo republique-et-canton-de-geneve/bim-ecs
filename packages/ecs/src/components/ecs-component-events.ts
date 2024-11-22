@@ -1,6 +1,6 @@
 import type { EcsEvent } from '../event-bus';
 import type { EntityId } from '../entities/entity-id';
-import type { EcsComponent } from './ecs-component.ts';
+import type { EcsComponent } from './ecs-component';
 
 export const ECS_COMPONENT_LINK_ADDED = Symbol('ECS_COMPONENT_LINK_ADDED') as EcsEvent<{
   component: EcsComponent<any>;

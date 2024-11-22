@@ -1,18 +1,18 @@
 import { EcsWorld } from '../world';
 import { filter, flatMap } from '@bim/iterable';
 import type { EcsComponent } from '../components';
-import { MODIFIER_RESULT } from './_builder/modifier-result.ts';
-import { archetypeMaskExcluded, archetypeMaskIncluded } from './_archetype/archetype-mask-operations.ts';
-import { QueryClr } from './_builder/query-clr.ts';
-import { without } from './_builder/without.ts';
-import { withValue } from './_builder/with-value.ts';
-import { withComponent } from './_builder/with-component.ts';
-import { archetypeMaskFor } from './_archetype/archetype-mask-for.ts';
-import { ArchetypeCache } from './_archetype/archetype-cache.ts';
-import { QueryDefinition } from './query-definition.ts';
+import { MODIFIER_RESULT } from './_builder/modifier-result';
+import { archetypeMaskExcluded, archetypeMaskIncluded } from './_archetype/archetype-mask-operations';
+import { QueryClr } from './_builder/query-clr';
+import { without } from './_builder/without';
+import { withValue } from './_builder/with-value';
+import { withComponent } from './_builder/with-component';
+import { archetypeMaskFor } from './_archetype/archetype-mask-for';
+import { ArchetypeCache } from './_archetype/archetype-cache';
+import { QueryDefinition } from './query-definition';
 import { ArchetypeMask } from './_archetype';
-import { runQueryOnArchetypeMask } from './run-query-on-archetype-mask.ts';
-import { compileQueryDefinition } from './compile-query.ts';
+import { runQueryOnArchetypeMask } from './run-query-on-archetype-mask';
+import { compileQueryDefinition } from './compile-query';
 
 /**
  * Handles ECS querying

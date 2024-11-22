@@ -19,7 +19,7 @@ import { EntityPool } from '../entities/entity-pool';
 import { ECS_ENTITY_SPAWNED } from '../entities/entities-events';
 import type { EcsPlugin } from './ecs-plugin';
 import { DebugTracker } from '../debug/debug-tracker';
-import { QueryEngine } from '../querying/query-engine.ts';
+import { QueryEngine } from '../querying/query-engine';
 
 /** ECS world handling the overall ECS life cycle */
 export class EcsWorld implements Disposable {

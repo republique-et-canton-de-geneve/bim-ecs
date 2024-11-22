@@ -1,6 +1,6 @@
-import { QueryClr } from './query-clr.ts';
+import { QueryClr } from './query-clr';
 import { EcsComponent } from '../../components';
-import { MODIFIER_RESULT } from './modifier-result.ts';
+import { MODIFIER_RESULT } from './modifier-result';
 
 export const withComponent =
   (definition: QueryClr) =>

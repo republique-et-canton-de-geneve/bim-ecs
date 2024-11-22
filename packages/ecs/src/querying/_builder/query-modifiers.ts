@@ -1,6 +1,6 @@
-import type { without } from './without.ts';
-import type { withValue } from './with-value.ts';
-import { withComponent } from './with-component.ts';
+import type { without } from './without';
+import type { withValue } from './with-value';
+import { withComponent } from './with-component';
 
 export interface QueryModifiers {
   without: ReturnType<typeof without>;

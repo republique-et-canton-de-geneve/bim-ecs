@@ -18,7 +18,7 @@ h1 {
 
 .scene {
     background: var(--background);
-    border: 1px solid #ddd;
+    border: 3px solid #ddd;
     border-radius: 4px;
 }
 
@@ -36,7 +36,6 @@ h1 {
 
 .scene>.plate {
     background: #ffffff;
-    border: 2px solid #000000;
     box-sizing: border-box;
     border-radius: 5px;
 }
@@ -44,4 +43,19 @@ h1 {
 .scene>.ball {
     background: #ffffff;
     border-radius: 50%;
+    box-sizing: border-box;
+}
+
+/* Neon theme override */
+
+body.neon .scene>.plate {
+    background: black;
+    border: 2px solid #7accff;
+    box-shadow: 0 0 10px #00ffea;
+}
+
+body.neon .scene>.ball {
+    background: #ff00f2;
+    border: 2px solid #ff00f2;
+    box-shadow: 0 0 10px 1px #ff006a;
 }

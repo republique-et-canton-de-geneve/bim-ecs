@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { archetypeMaskIncluded } from './archetype-mask-operations.ts';
+import { archetypeMaskIncluded } from './archetype-mask-operations';
 
 describe('archetype-mask-operations', () => {
   describe('archetypeMaskIncluded', () => {

@@ -1,7 +1,7 @@
-import { Archetype, ArchetypeMask } from './archetype.ts';
+import { Archetype, ArchetypeMask } from './archetype';
 import { reduce } from '@bim/iterable';
-import { ComponentTypeIdFlagCounter } from '../component-type-id-flag-counter.ts';
-import { getComponentTypeId } from '../component-type-ids.ts';
+import { ComponentTypeIdFlagCounter } from '../component-type-id-flag-counter';
+import { getComponentTypeId } from '../component-type-ids';
 
 /**
  * Creates a 32bits mask for specified archetype

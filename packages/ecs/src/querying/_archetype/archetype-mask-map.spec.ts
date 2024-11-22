@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ArchetypeMaskMap } from './archetype-mask-map.ts';
+import { ArchetypeMaskMap } from './archetype-mask-map';
 
 describe('ArchetypeMaskMap', () => {
   it('should set and get values with identical Uint32Array keys', () => {

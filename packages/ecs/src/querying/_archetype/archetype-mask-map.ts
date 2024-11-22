@@ -1,6 +1,6 @@
 import { ArchetypeMaskHash, hashArchetypeMask } from './hash-archetype-mask';
 import { map } from '@bim/iterable';
-import type { ArchetypeMask } from './archetype.ts';
+import type { ArchetypeMask } from './archetype';
 
 /** Handles values mapping by `ArchetypeMask` */
 export class ArchetypeMaskMap<V> {

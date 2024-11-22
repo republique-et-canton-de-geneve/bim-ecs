@@ -1,12 +1,12 @@
 import { EcsComponent } from '@bim/ecs/components';
 import { defineSystem, EcsPlugin } from '@bim/ecs';
 import { frame, startup } from '@bim/ecs/scheduling';
-import { BoxGeometry } from './box-geometry.ts';
-import { Config } from './config.ts';
-import { Name } from './common.ts';
-import { Velocity } from './velocity.ts';
-import { BallCollisionTrigger } from './ball-collision-trigger.ts';
-import { Disabled } from './disabling.ts';
+import { BoxGeometry } from './box-geometry';
+import { Config } from './config';
+import { Name } from './common';
+import { Velocity } from './velocity';
+import { BallCollisionTrigger } from './ball-collision-trigger';
+import { Disabled } from './disabling';
 
 export const ballPlugin: EcsPlugin = (world) => {
   world.registerSystem(initializeBallSystem);
@@ -65,7 +65,7 @@ export const updateBallSystem = defineSystem(
 
           // Publishing dedicated collision event
           const event = components.get(BallCollisionTrigger)?.value;
-          if (event) bus.publish(event, obstacle);
+          if (event) bus.publish(event, { ball, obstacle });
           break;
         }
       }
@@ -77,11 +77,16 @@ export const updateBallSystem = defineSystem(
         velocity.invertX();
       }
 
-      if (
-        (velocity.value.y < 0 && boxGeometry.value.y < config.ballRadius) || // top border
-        (velocity.value.y > 0 && boxGeometry.value.y > config.height - config.ballRadius) // bottom border. TODO => game over
-      ) {
+      // top border
+      if (velocity.value.y < 0 && boxGeometry.value.y < config.ballRadius) {
         velocity.invertY();
+      }
+
+      // bottom border -> ball lost
+      if (velocity.value.y > 0 && boxGeometry.value.y > config.height - config.ballRadius) {
+        if (config.noTrapMode)
+          velocity.invertY(); // cheat mode -> ball is bouncing at bottom
+        else entities.remove(ball);
       }
 
       velocity.applyOnBoxGeometry(boxGeometry);

@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { runQueryOnArchetypeMask } from './run-query-on-archetype-mask.ts';
-import { compileQueryDefinition } from './compile-query.ts';
+import { runQueryOnArchetypeMask } from './run-query-on-archetype-mask';
+import { compileQueryDefinition } from './compile-query';
 import { EcsComponent } from '../components';
-import { archetypeMaskFor } from './_archetype/archetype-mask-for.ts';
-import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter.ts';
+import { archetypeMaskFor } from './_archetype/archetype-mask-for';
+import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter';
 
 describe('run-query-on-archetype-mask', () => {
   it('should be a match with only inclusive statements', () => {

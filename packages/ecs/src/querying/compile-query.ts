@@ -1,10 +1,10 @@
-import { QueryDefinition } from './query-definition.ts';
-import { QueryClr } from './_builder/query-clr.ts';
+import { QueryDefinition } from './query-definition';
+import { QueryClr } from './_builder/query-clr';
 import { filter } from '@bim/iterable';
-import { without } from './_builder/without.ts';
-import { withValue } from './_builder/with-value.ts';
-import { withComponent } from './_builder/with-component.ts';
-import { MODIFIER_RESULT } from './_builder/modifier-result.ts';
+import { without } from './_builder/without';
+import { withValue } from './_builder/with-value';
+import { withComponent } from './_builder/with-component';
+import { MODIFIER_RESULT } from './_builder/modifier-result';
 import type { EcsComponent } from '../components';
 
 /**

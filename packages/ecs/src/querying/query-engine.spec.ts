@@ -1,8 +1,8 @@
 // noinspection DuplicatedCode
 
 import { describe, it, expect } from 'vitest';
-import { QueryEngine } from './query-engine.ts';
-import { EntityPool } from '../entities/entity-pool.ts';
+import { QueryEngine } from './query-engine';
+import { EntityPool } from '../entities/entity-pool';
 import { EventBus } from '../event-bus';
 import { EcsComponent } from '../components';
 

@@ -1,11 +1,11 @@
 import { describe, it, expect } from 'vitest';
 import { EcsWorld } from '../world';
 import { defineSystem } from '../systems';
-import { spawned } from './spawned.ts';
+import { spawned } from './entity-spawned';
 import { EcsComponent } from '../components';
 
 describe('spawned', () => {
-  it('should trigger once the system', async () => {
+  it('should trigger once the bound system', async () => {
     class Component1 extends EcsComponent {}
 
     let fooCount = 0;

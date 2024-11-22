@@ -1,10 +1,10 @@
 import { EcsWorld } from '@bim/ecs';
-import { eventsHandlingPlugin } from './inputs-binding.ts';
-import { renderingPlugin } from './rendering.ts';
-import { bricksPlugin } from './brick.ts';
-import { platePlugin } from './plate.ts';
-import { ballPlugin } from './ball.ts';
-import { disablingPlugin } from './disabling.ts';
+import { eventsHandlingPlugin } from './inputs-binding';
+import { renderingPlugin } from './rendering';
+import { bricksPlugin } from './brick';
+import { platePlugin } from './plate';
+import { ballPlugin } from './ball';
+import { disablingPlugin } from './disabling';
 
 const world = new EcsWorld();
 

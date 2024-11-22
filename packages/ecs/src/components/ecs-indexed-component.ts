@@ -1,4 +1,4 @@
-import { EcsComponent } from './ecs-component.ts';
+import { EcsComponent } from './ecs-component';
 
 /**
  * Ecs indexed component base definition.

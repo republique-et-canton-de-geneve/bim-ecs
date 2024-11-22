@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter.ts';
+import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter';
 
 describe('ComponentTypeIdFlagCounter', () => {
   it('should create the next id correctly', () => {

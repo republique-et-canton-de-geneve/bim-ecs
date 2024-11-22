@@ -1,8 +1,8 @@
-import { QueryClr } from './_builder/query-clr.ts';
+import { QueryClr } from './_builder/query-clr';
 import { ArchetypeMask } from './_archetype';
-import { archetypeMaskExcluded, archetypeMaskIncluded } from './_archetype/archetype-mask-operations.ts';
-import { archetypeMaskFor } from './_archetype/archetype-mask-for.ts';
-import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter.ts';
+import { archetypeMaskExcluded, archetypeMaskIncluded } from './_archetype/archetype-mask-operations';
+import { archetypeMaskFor } from './_archetype/archetype-mask-for';
+import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter';
 
 export function runQueryOnArchetypeMask(shell: QueryClr, mask: ArchetypeMask, counter: ComponentTypeIdFlagCounter) {
   return (

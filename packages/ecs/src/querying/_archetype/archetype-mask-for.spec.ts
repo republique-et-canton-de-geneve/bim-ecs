@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { EcsComponent } from '../components';
 import { COMPONENT_ID_FLAG } from './component-type-ids';
 import { archetypeMaskFor } from './archetype-mask-for';
-import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter.ts';
+import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter';
 
 describe('archetype-mask-for', () => {
   it('should create a mask from components', () => {

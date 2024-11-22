@@ -2,17 +2,19 @@ import { EcsPlugin } from '@bim/ecs';
 import { defineSystem } from '@bim/ecs';
 import { EcsComponent } from '@bim/ecs/components';
 import { startup, after } from '@bim/ecs/scheduling';
-import { Config } from './config.ts';
-import { BoxGeometry } from './box-geometry.ts';
-import { initializePlateSystem, Plate, updatePlateSystem } from './plate.ts';
-import { Ball, initializeBallSystem, updateBallSystem } from './ball.ts';
-import { Name } from './common.ts';
-import { initializeBricksSystem } from './brick.ts';
+import { Config } from './config';
+import { BoxGeometry } from './box-geometry';
+import { initializePlateSystem, Plate, updatePlateSystem } from './plate';
+import { Ball, initializeBallSystem, updateBallSystem } from './ball';
+import { Name } from './common';
+import { initializeBricksSystem } from './brick';
+import { entityRemoved } from '@bim/ecs/scheduling';
 
 export const renderingPlugin: EcsPlugin = (world) => {
   world.registerSystem(initializeSceneSystem);
   world.registerSystem(updatePlateRenderingSystem);
   world.registerSystem(initializeBoxGeometriesRenderingSystem);
+  world.registerSystem(handleEntityDeletionSystem);
   world.registerSystem(updateBallRenderingSystem);
 };
 
@@ -68,6 +70,16 @@ export const initializeBoxGeometriesRenderingSystem = defineSystem(
   //   return [BoxGeometry, without(DOMElementComponent)]; // option A
   // }), // option A
   after([initializeBricksSystem, initializePlateSystem, initializeBallSystem]), // option B
+);
+
+export const handleEntityDeletionSystem = defineSystem(
+  'Handle Box geometry deletion',
+  (_, { payload }) => {
+    const domElement = [...payload.components].find((component: any) => component.constructor === DOMElementComponent)!
+      .value as HTMLElement;
+    domElement.remove();
+  },
+  entityRemoved(() => [BoxGeometry, DOMElementComponent]),
 );
 
 export const updatePlateRenderingSystem = defineSystem(

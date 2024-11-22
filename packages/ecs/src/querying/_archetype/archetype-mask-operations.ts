@@ -1,4 +1,4 @@
-import { ArchetypeMask } from './archetype.ts';
+import { ArchetypeMask } from './archetype';
 
 /**
  * Is mask1 included in mask2 ?

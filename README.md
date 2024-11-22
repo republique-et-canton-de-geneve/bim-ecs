@@ -5,12 +5,14 @@
 > **Warning:** This library is still under heavy development.
 
 ## What this ECS implementation is designed for :
-  - Modularisation
-  - Entities querying on a large amount of data (byteECS is doing a very nice job on this but doesn't have required feature + component values cannot be strings)
-  - Components value indexing (WIP)
-  - Advanced systems scheduling
+
+- Modularisation
+- Entities querying on a large amount of data (byteECS is doing a very nice job on this but doesn't have required feature + component values cannot be strings)
+- Components value indexing (WIP)
+- Advanced systems scheduling
 
 ## What this ECS implementation is NOT designed for :
+
 The architecture of this project has been built as a requirement for the BIM project at "Etat de Genève". This means some features are required, others are nice to have, and some
 are unwanted, because readability may be more important than performances in some cases and vice versa.
 
@@ -46,90 +48,88 @@ flowchart LR
 > `//TODO: show entities/components`
 
 ```typescript
-import { EcsWorld } from './world'
-import { defineSystem } from './systems/define-system'
-import { startup, timer } from './scheduling'
-import { after } from './scheduling/after'
-import type { EcsEvent } from './event-bus'
-import { on } from './scheduling/on'
-import { EcsResource } from './resources'
+import { EcsWorld } from './world';
+import { defineSystem } from './systems/define-system';
+import { startup, timer } from './scheduling';
+import { after } from './scheduling/after';
+import type { EcsEvent } from './event-bus';
+import { on } from './scheduling/on';
+import { EcsResource } from './resources';
 
 /** world instance */
-const world = new EcsWorld({ verbose: true })
+const world = new EcsWorld({ verbose: true });
 
 /** Counter state resource */
 class CounterResource extends EcsResource {
   constructor(public value = 0) {
-    super()
+    super();
   }
 }
 
 // Event handling
-const clickEvent = Symbol('clickEvent') as EcsEvent<{ boost: 20 }>
-document.addEventListener('click', () => world.bus.publish(clickEvent, { boost: 20 }))
+const clickEvent = Symbol('clickEvent') as EcsEvent<{ boost: 20 }>;
+document.addEventListener('click', () => world.bus.publish(clickEvent, { boost: 20 }));
 
 // Systems
 const initSystem = defineSystem(
   'init',
   ({ container }) => {
-    console.log('Hello init')
-    container.register(new CounterResource(5))
+    console.log('Hello init');
+    container.register(new CounterResource(5));
   },
   startup, // At startup
-)
+);
 
 const initSystem2 = defineSystem(
   'init 2',
   () => {
-    console.log('Hello init 2')
+    console.log('Hello init 2');
   },
   after(initSystem), // After init system has finished (supports async predecessor)
-)
+);
 
 const pollSystem = defineSystem(
   'polling',
   ({ container }) => {
-    console.log('I am polling, counter value is: ', container.resolve(CounterResource).value++)
+    console.log('I am polling, counter value is: ', container.resolve(CounterResource).value++);
   },
   timer(1000), // Each second
-)
+);
 
 const handleClickSystem = defineSystem(
   'handle click',
   ({ container }, { payload }) => {
-    console.log(
-      'boost counter',
-      payload,
-      (container.resolve(CounterResource).value += payload.boost),
-    )
+    console.log('boost counter', payload, (container.resolve(CounterResource).value += payload.boost));
   },
   on(clickEvent), // On browser page click
-)
+);
 
 // Registration
 world
   .registerSystem(initSystem)
   .registerSystem(pollSystem)
   .registerSystem(initSystem2)
-  .registerSystem(handleClickSystem)
+  .registerSystem(handleClickSystem);
 
 // World activation
-world.run()
+world.run();
 ```
 
 ## Démo projects
+
 A démo project is part of this monorepo (many others to come hopefully :-).  
 Checkout the ["ECS- Arkanoid" source code](./demo/arkanoid/src) to see ECS library in action:
 
-![arkanoid-screenshot.png](./doc/assets/arkanoid-screenshot.png)  
+![arkanoid-screenshot.png](./doc/assets/arkanoid-screenshot.png)
 
 Systems structure (cf. tooling) :  
 ![arkanoid-structure-screenshot.png](./doc/assets/arkanoid-structure-screenshot.png)
 
 **Run the project on local machine :**  
 From the root folder,
-* `npm install`
-* `npm run demo:arkanoid` 
+
+- `npm install`
+- `npm run demo:arkanoid`
 
 ## Tooling
 
@@ -153,62 +153,75 @@ Entities are actually indexes from which components are linked. `EntityPool` wor
 This creates 2 entities within the world
 
 ```typescript
-import { EcsWorld } from './ecs-world'
-import { EcsComponent } from './component'
+import { EcsWorld } from './ecs-world';
+import { EcsComponent } from './component';
 
-class PersonComponent extends EcsComponent {}
-class AnimalComponent extends EcsComponent {}
+class Person extends EcsComponent {}
+class Animal extends EcsComponent {}
 class NameComponent extends EcsComponent<string> {}
 
-const world = new EcsWorld()
-world.entities.spawn(new PersonComponent(), new NameComponent('Bob'))
-world.entities.spawn(new AnimalComponent(), new NameComponent('Foxy'))
+const world = new EcsWorld();
+world.entities.spawn(new Person(), new NameComponent('Bob'));
+world.entities.spawn(new Animal(), new NameComponent('Foxy'));
 ```
 
-### Removing a new entity
+### Removing an entity
 
 This creates 2 entities within the world and removes foxy
 
 ```typescript
-import { EcsWorld } from './ecs-world'
-import { EcsComponent } from './component'
+import { EcsWorld } from './ecs-world';
+import { EcsComponent } from './component';
 
-class PersonComponent extends EcsComponent {}
-class AnimalComponent extends EcsComponent {}
+class Person extends EcsComponent {}
+class Animal extends EcsComponent {}
 class NameComponent extends EcsComponent<string> {}
 
-const world = new EcsWorld()
-world.entities.spawn(new PersonComponent(), new NameComponent('Bob'))
-const foxyEntity = world.entities.spawn(new AnimalComponent(), new NameComponent('Foxy'))
+const world = new EcsWorld();
+world.entities.spawn(new Person(), new NameComponent('Bob'));
+const foxyEntity = world.entities.spawn(new Animal(), new NameComponent('Foxy'));
 
 // Microtask delay here
 
-world.entities.remove(foxy)
+world.entities.remove(foxy);
 ```
 
-### Changing entity links
+### Fetching entity components
+
+```typescript
+import { EcsWorld } from './ecs-world';
+import { EcsComponent } from './component';
+
+class Person extends EcsComponent {}
+class Name extends EcsComponent<string> {}
+
+const world = new EcsWorld();
+const person = world.entities.spawn(new Person(), new Name('Bob'));
+
+const components = world.entities.componentsOf(personn);
+const personNameValue = components.get(Name)!.value;
+```
+
+### Updating entity composition
 
 This transforms foxy into a person
 
 ```typescript
-import { EcsWorld } from './ecs-world'
-import { EcsComponent } from './component'
+import { EcsWorld } from './ecs-world';
+import { EcsComponent } from './component';
 
-class PersonComponent extends EcsComponent {}
-class AnimalComponent extends EcsComponent {}
-class NameComponent extends EcsComponent<string> {}
+class Person extends EcsComponent {}
+class Animal extends EcsComponent {}
+class Name extends EcsComponent<string> {}
 
-const world = new EcsWorld()
-world.entities.spawn(new PersonComponent(), new NameComponent('Bob'))
-const foxyEntity = world.entities.spawn(new AnimalComponent(), new NameComponent('Foxy'))
+const world = new EcsWorld();
+world.entities.spawn(new Person(), new Name('Bob'));
+const foxyEntity = world.entities.spawn(new Animal(), new Name('Foxy'));
 
 // Microtask delay here
 
-world.entities.removeComponentFromEntity(foxyEntity, AnimalComponent)
-world.entities.addComponentToEntity(
-  foxyEntity,
-  new PersonComponent() /* Instance could also have been eventually reused*/,
-)
+world.entities.removeComponentFromEntity(foxyEntity, Animal);
+world.entities.addComponentToEntity(foxyEntity, new Person() /* Instance could also have been eventually reused*/);
 ```
 
 ## Components
@@ -216,9 +229,10 @@ world.entities.addComponentToEntity(
 // TODO finalize implementation
 
 ECS components inherit `EcsComponent<TValue>` class or derived. There are basically 3 kind of base classes provided by the library:
-* `EcsComponent<TValue>` (with `TValue = void` by default) stands for an immutable component
-* `EcsMutableComponent<TValue>` (with mandatory `TValue`) stands for a component with a mutable value. This mutation can be used to schedule systems handling this mutation for instance (WIP)
-* `EcsIndexedComponent<TValue>` (with mandatory `TValue`) stands for a component with an immutable value which can be used in queries (WIP)
+
+- `EcsComponent<TValue>` (with `TValue = void` by default) stands for an immutable component
+- `EcsMutableComponent<TValue>` (with mandatory `TValue`) stands for a component with a mutable value. This mutation can be used to schedule systems handling this mutation for instance (WIP)
+- `EcsIndexedComponent<TValue>` (with mandatory `TValue`) stands for a component with an immutable value which can be used in queries (WIP)
 
 > Important current limitation: The current ECS implementation can handle a limited combinations of archetypes.
 > Combinations are using bits masking through `UInt32Array`. The size of these arrays are fix for now and may be dynamic in the future.
@@ -231,25 +245,25 @@ ECS components inherit `EcsComponent<TValue>` class or derived. There are basica
 ### Basics of querying
 
 ```typescript
-import { EcsWorld } from './ecs-world'
-import { EcsComponent } from './component'
-import { defineQuery } from './define-query'
+import { EcsWorld } from './ecs-world';
+import { EcsComponent } from './component';
+import { defineQuery } from './define-query';
 
-const world = new EcsWorld()
+const world = new EcsWorld();
 
 // Components
-class PersonComponent extends EcsComponent {}
-class AnnimalComponent extends EcsComponent {}
-class NameComponent extends EcsComponent<string> {}
+class Person extends EcsComponent {}
+class Animal extends EcsComponent {}
+class Name extends EcsComponent<string> {}
 
 // Entities
-world.entities.spawn(new PersonComponent(), new NameComponent('Bob'))
-world.entities.spawn(new AnnimalComponent(), new NameComponent('Foxy'))
+world.entities.spawn(new Person(), new Name('Bob'));
+world.entities.spawn(new Animal(), new Name('Foxy'));
 
 // New query usage target
-world.query.execute(() => [Component1, Component2])
-world.query.execute(({without}) => [Component1, without(Component2)])
-world.query.execute(({withValue}) => [Component1, withValue(Component2, 'foo')])
+world.query.execute(() => [Component1, Component2]);
+world.query.execute(({ without }) => [Component1, without(Component2)]);
+world.query.execute(({ withValue }) => [Component1, withValue(Component2, 'foo')]);
 ```
 
 ### Query processing details
@@ -273,8 +287,8 @@ to create "ticks" on which associated systems are triggered.
 This is the most basic scheduler, triggering once when the world is started.
 
 ```typescript
-import { defineSystem } from './define-system'
-import { startup } from './startup'
+import { defineSystem } from './define-system';
+import { startup } from './startup';
 
 defineSystem(
   'foo',
@@ -282,7 +296,7 @@ defineSystem(
     // implementation here
   },
   startup, // Triggers the system only once at world startup
-)
+);
 ```
 
 ##### timer
@@ -290,8 +304,8 @@ defineSystem(
 This scheduler is triggering a Date.Now() each specified interval. Interval is specified as a parameter.
 
 ```typescript
-import { defineSystem } from './define-system'
-import { timer } from './timer'
+import { defineSystem } from './define-system';
+import { timer } from './timer';
 
 defineSystem(
   'foo',
@@ -299,7 +313,7 @@ defineSystem(
     // implementation here
   },
   timer(500), // Triggers the system every 500ms
-)
+);
 ```
 
 ##### frame
@@ -307,8 +321,8 @@ defineSystem(
 This scheduler triggers each frame
 
 ```typescript
-import { defineSystem } from './define-system'
-import { frame } from './frame'
+import { defineSystem } from './define-system';
+import { frame } from './frame';
 
 defineSystem(
   'foo',
@@ -316,7 +330,7 @@ defineSystem(
     // implementation here
   },
   frame, // Triggers the system every frame
-)
+);
 ```
 
 ##### on
@@ -324,11 +338,11 @@ defineSystem(
 This scheduler when the specified event is fired within the world event bus
 
 ```typescript
-import { defineSystem } from './define-system'
-import { on } from './on'
-import { EcsEvent } from './ecs-event'
+import { defineSystem } from './define-system';
+import { on } from './on';
+import { EcsEvent } from './ecs-event';
 
-const FOO_EVENT = Symbol('foo event') as EcsEvent<number>
+const FOO_EVENT = Symbol('foo event') as EcsEvent<number>;
 
 defineSystem(
   'foo',
@@ -337,7 +351,7 @@ defineSystem(
     // implementation here
   },
   on(FOO_EVENT), // Triggers the system whenever the event is fired from world event bus
-)
+);
 ```
 
 ##### after
@@ -345,24 +359,24 @@ defineSystem(
 This scheduler is triggered whenever specified system has finished processing
 
 ```typescript
-import { defineSystem } from './define-system'
-import { after } from './after'
+import { defineSystem } from './define-system';
+import { after } from './after';
 
-const system1 = defineSystem(/* System parameters here */)
+const system1 = defineSystem(/* System parameters here */);
 defineSystem(
   'foo',
   () => {
     // implementation here
   },
   after(system1), // Triggers the system each time the system1 has finished being processed
-)
+);
 ```
 
 Multiple systems can be specified. A combination option can be set (default value is `or`)
 
 ```typescript
-import { defineSystem } from './define-system'
-import { after } from './after'
+import { defineSystem } from './define-system';
+import { after } from './after';
 
 defineSystem(
   'foo',
@@ -372,7 +386,7 @@ defineSystem(
   after([system1, system2], {
     combination: 'and', // Triggers the system each time the system1 AND system2 have been BOTH processed
   }),
-)
+);
 ```
 
 #### Scheduler modifiers
@@ -382,9 +396,9 @@ defineSystem(
 Scheduler can be aggregated this way:
 
 ```typescript
-import { compose } from './compose'
+import { compose } from './compose';
 
-compose(scheduler1, scheduler2) // Creates a scheduler combining scheduler1 and scheduler2 ticks
+compose(scheduler1, scheduler2); // Creates a scheduler combining scheduler1 and scheduler2 ticks
 ```
 
 ##### debounce
@@ -392,9 +406,9 @@ compose(scheduler1, scheduler2) // Creates a scheduler combining scheduler1 and 
 Scheduler can be debounced this way:
 
 ```typescript
-import { debounce } from './debounce'
+import { debounce } from './debounce';
 
-debounce(scheduler1, 10) // Resulting scheduler won't tick until scheduler1 separates its own ticks with at least 10ms
+debounce(scheduler1, 10); // Resulting scheduler won't tick until scheduler1 separates its own ticks with at least 10ms
 ```
 
 ##### when
@@ -402,12 +416,12 @@ debounce(scheduler1, 10) // Resulting scheduler won't tick until scheduler1 sepa
 Scheduler can be filtered this way:
 
 ```typescript
-import { when } from './when'
+import { when } from './when';
 
 debounce((world) => {
   // Prepare here (container resolution for instance)
-  return () => computePredicate() // Process filter here
-}, scheduler1) // Resulting scheduler won't tick if predicate result is falsy
+  return () => computePredicate(); // Process filter here
+}, scheduler1); // Resulting scheduler won't tick if predicate result is falsy
 ```
 
 ## Resources
@@ -419,14 +433,14 @@ It supports both lazy creation of resources and registration of pre-existing res
 ### Basic usage
 
 ```typescript
-import { EcsResource } from './ecs-resource'
+import { EcsResource } from './ecs-resource';
 
-const resourceContainer = new ResourceContainer()
+const resourceContainer = new ResourceContainer();
 
 class MyResource extends EcsResourceResource {}
 
-const myResourceInstance = resourceContainer.resolve(MyResource) // Creates and returns a new instance of MyResource
-const sameResourceInstance = resourceContainer.resolve(MyResource) // Returns the existing instance of MyResource
+const myResourceInstance = resourceContainer.resolve(MyResource); // Creates and returns a new instance of MyResource
+const sameResourceInstance = resourceContainer.resolve(MyResource); // Returns the existing instance of MyResource
 ```
 
 ##3 Resources Factory
@@ -456,33 +470,33 @@ function for easy un-subscription, while the publish method notifies all subscri
 
 ```typescript
 // Define some event keys
-import { EcsEvent } from './ecs-event'
+import { EcsEvent } from './ecs-event';
 
-const eventA = Symbol('eventA') as EcsEvent<string>
-const eventB = Symbol('eventB') as EcsEvent<number>
+const eventA = Symbol('eventA') as EcsEvent<string>;
+const eventB = Symbol('eventB') as EcsEvent<number>;
 
 // Create an event bus instance
-const eventBus = new EventBus()
+const eventBus = new EventBus();
 
 // Subscribe to events
 const unsubscribeA = eventBus.subscribe(eventA, (value: string) => {
-  console.log('Event A received:', value)
-})
+  console.log('Event A received:', value);
+});
 const unsubscribeB = eventBus.subscribe(eventB, (value: number) => {
-  console.log('Event B received:', value)
-})
+  console.log('Event B received:', value);
+});
 
 // Publish events
-eventBus.publish(eventA, 'Hello, Event A!')
-eventBus.publish(eventB, 42)
+eventBus.publish(eventA, 'Hello, Event A!');
+eventBus.publish(eventB, 42);
 
 // Unsubscribe from events
-unsubscribeA()
-unsubscribeB()
+unsubscribeA();
+unsubscribeB();
 
 // Publish events again to see if handlers are removed
-eventBus.publish(eventA, 'Hello again, Event A!')
-eventBus.publish(eventB, 84)
+eventBus.publish(eventA, 'Hello again, Event A!');
+eventBus.publish(eventB, 84);
 ```
 
 ## Plugins
@@ -490,36 +504,35 @@ eventBus.publish(eventB, 84)
 Plugins can be used to package features connected to `EcsWorld`:
 
 ```typescript
-import { EcsPlugin } from './ecs-plugin'
+import { EcsPlugin } from './ecs-plugin';
 
 const FooPlugin: EcsPlugin = (world) => {
   // Systems registration
-  world.registerSystem(foo1System)
-  world.registerSystem(foo2System)
+  world.registerSystem(foo1System);
+  world.registerSystem(foo2System);
 
   // Queries registration
-  world.query.register(fooQuery)
+  world.query.register(fooQuery);
 
   // Resources declaration
-  world.container.register(FooResource, new FooResource('foo'))
+  world.container.register(FooResource, new FooResource('foo'));
 
   // Event handling, ect...
-}
+};
 ```
 
 Registered on to world instance this way:
 
 ```typescript
-import { EcsWorld } from './ecs-world'
-import { FooPlugin } from './foo-plugin'
+import { EcsWorld } from './ecs-world';
+import { FooPlugin } from './foo-plugin';
 
 /** Ecs world instance */
-const world = new EcsWorld()
+const world = new EcsWorld();
 
 // Plugin registration
-world.use(FooPlugin)
+world.use(FooPlugin);
 ```
-
 
 ## How to contribute
 

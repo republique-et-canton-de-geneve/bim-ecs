@@ -50,22 +50,27 @@ export class EntityPool {
    */
   public componentsOf(entityId: EntityId) {
     return new Map(
-      map(this.componentsByEntity.get(entityId) ?? [], (component) => [component.constructor, component] as [typeof EcsComponent<any>, EcsComponent<any>]),
+      map(
+        this.componentsByEntity.get(entityId) ?? [],
+        (component) => [component.constructor, component] as [typeof EcsComponent<any>, EcsComponent<any>],
+      ),
     ) as {
       /**
        * Gets the component instance
        * @param componentType The component type
        */
-      get<TComponent extends EcsComponent<TValue>, TValue>(componentType: EcsComponentCtor<TComponent, TValue>): TComponent | undefined
+      get<TComponent extends EcsComponent<TValue>, TValue>(
+        componentType: EcsComponentCtor<TComponent, TValue>,
+      ): TComponent | undefined;
 
       /**
        * Determines whether the entity contains the component from its type
        * @param componentType The component type
        */
-      has(componentType: typeof EcsComponent<any>): boolean
+      has(componentType: typeof EcsComponent<any>): boolean;
 
       /** Provides the enumeration of ecs component instances */
-      values():Iterable<typeof EcsComponent<any>>
+      values(): Iterable<typeof EcsComponent<any>>;
     };
   }
 
@@ -87,22 +92,6 @@ export class EntityPool {
       return true;
     }
   }
-
-  // public addComponentToEntitiesOrSpawn(query: QueryDefinition<any>, ...components: Component<any>[]) {
-  //   throw new Error('Not implemented yet'); // TODO finish addComponentToEntity implementation to handle doublons
-  //   const queryResult = this.world.query.execute(query);
-  //   const firstIteration = queryResult.next();
-  //   if (!firstIteration.done) {
-  //     // add Components case
-  //     this.addComponent(firstIteration.value!.entity, ...components);
-  //     for (const item of queryResult) {
-  //       this.addComponent(item.entity, ...components);
-  //     }
-  //   } else {
-  //     // spawn case
-  //     return [this.spawn(...components)];
-  //   }
-  // }
 
   /**
    * Removes the specified component from entity

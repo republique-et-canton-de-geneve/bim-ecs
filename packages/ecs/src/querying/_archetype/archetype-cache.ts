@@ -1,5 +1,5 @@
 import { ArchetypeMaskMap } from './archetype-mask-map';
-import { EntityId } from '../../entities/entity-id';
+import { EntityId } from '../../entities';
 import { archetypeFromComponents, ArchetypeMask } from './archetype';
 import { archetypeMaskFor } from './archetype-mask-for';
 import { ComponentTypeIdFlagCounter } from '../component-type-id-flag-counter';

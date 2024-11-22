@@ -50,6 +50,7 @@
     "glob": "11.0.0"
   },
   "dependencies": {
-    "@bim/iterable": "^0.0.0"
+    "@bim/iterable": "^0.0.0",
+    "@bim/tuple-collections": "^0.0.0"
   }
 }

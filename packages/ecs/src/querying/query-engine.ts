@@ -1,28 +1,22 @@
 import { EcsWorld } from '../world';
 import { filter, flatMap } from '@bim/iterable';
-import type { EcsComponent } from '../components';
-import { MODIFIER_RESULT } from './_builder/modifier-result';
-import { archetypeMaskExcluded, archetypeMaskIncluded } from './_archetype/archetype-mask-operations';
-import { QueryClr } from './_builder/query-clr';
-import { without } from './_builder/without';
-import { withValue } from './_builder/with-value';
-import { withComponent } from './_builder/with-component';
-import { archetypeMaskFor } from './_archetype/archetype-mask-for';
 import { ArchetypeCache } from './_archetype/archetype-cache';
 import { QueryDefinition } from './query-definition';
-import { ArchetypeMask } from './_archetype';
-import { runQueryOnArchetypeMask } from './run-query-on-archetype-mask';
+import { runQueryChunkOnArchetypeMask, runQueryChunkOnEntity } from './query-processing';
 import { compileQueryDefinition } from './compile-query';
+import { IndexedComponentsCache } from './_indexed-components/indexed-components-cache';
 
 /**
  * Handles ECS querying
  */
 export class QueryEngine implements Disposable {
   /** Entity archetype cache */
-  public readonly cache: ArchetypeCache;
+  public readonly archetypeCache: ArchetypeCache;
+  public readonly indexedComponentsCache: IndexedComponentsCache;
 
   constructor(private readonly world: Pick<EcsWorld, 'bus' | 'entities'>) {
-    this.cache = new ArchetypeCache(this.world);
+    this.archetypeCache = new ArchetypeCache(this.world);
+    this.indexedComponentsCache = new IndexedComponentsCache(this.world);
   }
 
   /**
@@ -50,16 +44,22 @@ export class QueryEngine implements Disposable {
    */
   public run(shell: ReturnType<QueryEngine['compile']>) {
     // Processing query through archetypes
-    const matchingArchetypeMasks = filter(this.cache.entitiesByArchetypeMask.keys(), (mask) =>
-      runQueryOnArchetypeMask(shell, mask, this.cache.counter),
+    const matchingArchetypeMasks = filter(this.archetypeCache.entitiesByArchetypeMask.keys(), (mask) =>
+      runQueryChunkOnArchetypeMask(shell, mask, this.archetypeCache.counter),
+    );
+    const fromArchetypesResult = flatMap(
+      matchingArchetypeMasks,
+      (mask) => this.archetypeCache.entitiesByArchetypeMask.get(mask) ?? [],
     );
 
-    // Rendering result
-    return flatMap(matchingArchetypeMasks, (mask) => this.cache.entitiesByArchetypeMask.get(mask) ?? []);
+    // Processing result through indexes query
+    return filter(fromArchetypesResult, (entity) =>
+      runQueryChunkOnEntity(entity, shell, this.indexedComponentsCache.entitiesByComponentValues),
+    );
   }
 
   /** @inheritDoc */
   [Symbol.dispose]() {
-    this.cache[Symbol.dispose]();
+    this.archetypeCache[Symbol.dispose]();
   }
 }

@@ -4,5 +4,5 @@ import { EcsComponent } from '../../components';
 export class QueryClr {
   public readonly with = new Set<typeof EcsComponent<any>>();
   public readonly without = new Set<typeof EcsComponent<any>>();
-  public readonly withValue = new Map<typeof EcsComponent<any>, any>();
+  public readonly withValue = [] as [typeof EcsComponent<any>, any][];
 }

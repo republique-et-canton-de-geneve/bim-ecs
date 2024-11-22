@@ -8,7 +8,11 @@ import { QueryDefinition } from '../querying/query-definition';
 import { archetypeMaskFor } from '../querying/_archetype/archetype-mask-for';
 import { map } from '@bim/iterable';
 import { Archetype } from '../querying/_archetype';
-import { runQueryOnArchetypeMask } from '../querying/run-query-on-archetype-mask';
+import {
+  runAtomicQueryOnSingleEntity,
+  runQueryChunkOnArchetypeMask,
+  runQueryChunkOnEntity,
+} from '../querying/query-processing';
 
 let idCounter = 0;
 
@@ -30,8 +34,17 @@ export function spawned(
 
     #unsubscribe: Function = this.world.bus.subscribe(ECS_ENTITY_SPAWNED, (args) => {
       const archetype = map(args.components, (component) => component.constructor) as Archetype;
-      const mask = archetypeMaskFor(archetype, this.world.query.cache.counter);
-      const queryMatchesEntity = runQueryOnArchetypeMask(this.#queryClr, mask, this.world.query.cache.counter);
+      const queryMatchesEntity = runAtomicQueryOnSingleEntity(
+        {
+          entity: args.entity,
+          componentsMask: archetypeMaskFor(archetype, this.world.query.archetypeCache.counter),
+        },
+        this.#queryClr,
+        {
+          counter: this.world.query.archetypeCache.counter,
+          indexesRepository: this.world.query.indexedComponentsCache.entitiesByComponentValues,
+        },
+      );
       if (!queryMatchesEntity) return;
 
       if (this.#resolveNext) {

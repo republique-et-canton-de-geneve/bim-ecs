@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { runQueryOnArchetypeMask } from './run-query-on-archetype-mask';
+import { runQueryChunkOnArchetypeMask } from './query-processing';
 import { compileQueryDefinition } from './compile-query';
 import { EcsComponent } from '../components';
 import { archetypeMaskFor } from './_archetype/archetype-mask-for';
@@ -11,7 +11,7 @@ describe('run-query-on-archetype-mask', () => {
 
     const cacheCounter = new ComponentTypeIdFlagCounter();
 
-    const result = runQueryOnArchetypeMask(
+    const result = runQueryChunkOnArchetypeMask(
       compileQueryDefinition(() => [Component1]),
       archetypeMaskFor([Component1], cacheCounter),
       cacheCounter,
@@ -25,7 +25,7 @@ describe('run-query-on-archetype-mask', () => {
 
     const cacheCounter = new ComponentTypeIdFlagCounter();
 
-    const result = runQueryOnArchetypeMask(
+    const result = runQueryChunkOnArchetypeMask(
       compileQueryDefinition(({ without }) => [without(Component1)]),
       archetypeMaskFor([Component1], cacheCounter),
       cacheCounter,

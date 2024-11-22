@@ -4,7 +4,7 @@ import { describe, it, expect } from 'vitest';
 import { QueryEngine } from './query-engine';
 import { EntityPool } from '../entities/entity-pool';
 import { EventBus } from '../event-bus';
-import { EcsComponent } from '../components';
+import { EcsComponent, EcsIndexedComponent } from '../components';
 
 describe('QueryEngine', () => {
   it('should provide entities with matching components', () => {
@@ -30,6 +30,33 @@ describe('QueryEngine', () => {
     expect(result).includes(spawnedEntities[1]);
     expect(result).includes(spawnedEntities[2]);
     expect(result).not.includes(spawnedEntities[3]); // No component 1 available on this entity
+  });
+
+  it('should provide entities with matching index values', () => {
+    const bus = new EventBus();
+    const entities = new EntityPool({ bus });
+    const query = new QueryEngine({ bus, entities });
+
+    class Component1 extends EcsComponent {}
+    class Component2 extends EcsIndexedComponent<string> {}
+
+    const spawnedEntities = [
+      entities.spawn(new Component1()), // 0
+      entities.spawn(new Component1(), new Component2('foo')), // 1
+      entities.spawn(new Component2('foo'), new Component1()), // 2
+      entities.spawn(new Component1(), new Component2('bar')), // 3
+      entities.spawn(new Component2('foo')), // 4
+    ];
+
+    const result = [...query.execute(({ withValue }) => [Component1, withValue(Component2, 'foo')])];
+
+    expect(result).toHaveLength(2);
+
+    expect(result).not.includes(spawnedEntities[0]);
+    expect(result).includes(spawnedEntities[1]);
+    expect(result).includes(spawnedEntities[2]);
+    expect(result).not.includes(spawnedEntities[3]);
+    expect(result).not.includes(spawnedEntities[4]);
   });
 
   it('should provide entities with matching components using "with"', () => {

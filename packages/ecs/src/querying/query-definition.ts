@@ -1,4 +1,4 @@
-import { QueryModifiers } from './_builder/query-modifiers';
+import type { QueryModifiers } from './_builder/query-modifiers';
 import type { EcsComponent } from '../components';
 import { MODIFIER_RESULT } from './_builder/modifier-result';
 

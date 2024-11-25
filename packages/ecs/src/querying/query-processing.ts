@@ -1,9 +1,9 @@
 import { QueryClr } from './_builder/query-clr';
-import { ArchetypeMask } from './_archetype';
+import type { ArchetypeMask } from './_archetype';
 import { archetypeMaskExcluded, archetypeMaskIncluded } from './_archetype/archetype-mask-operations';
 import { archetypeMaskFor } from './_archetype/archetype-mask-for';
 import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter';
-import { EntityId } from '../entities';
+import type { EntityId } from '../entities';
 import { EcsIndexedComponent } from '../components';
 import { TupleMap } from '@bim/tuple-collections';
 

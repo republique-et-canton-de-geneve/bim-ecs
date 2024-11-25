@@ -1,7 +1,7 @@
 import { EcsWorld } from '../world';
 import { filter, flatMap } from '@bim/iterable';
 import { ArchetypeCache } from './_archetype/archetype-cache';
-import { QueryDefinition } from './query-definition';
+import type { QueryDefinition } from './query-definition';
 import { runQueryChunkOnArchetypeMask, runQueryChunkOnEntity } from './query-processing';
 import { compileQueryDefinition } from './compile-query';
 import { IndexedComponentsCache } from './_indexed-components/indexed-components-cache';

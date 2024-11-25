@@ -1,4 +1,4 @@
-import { Archetype, ArchetypeMask } from './archetype';
+import type { Archetype, ArchetypeMask } from './archetype';
 import { reduce } from '@bim/iterable';
 import { ComponentTypeIdFlagCounter } from '../component-type-id-flag-counter';
 import { getComponentTypeId } from '../component-type-ids';

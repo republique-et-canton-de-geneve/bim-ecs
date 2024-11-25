@@ -1,4 +1,4 @@
-import { Archetype } from './archetype';
+import type { Archetype } from './archetype';
 import { archetypeMaskFor } from './archetype-mask-for';
 import { ComponentTypeIdFlagCounter } from '../component-type-id-flag-counter';
 

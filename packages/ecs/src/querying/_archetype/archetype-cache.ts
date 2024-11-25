@@ -1,6 +1,6 @@
 import { ArchetypeMaskMap } from './archetype-mask-map';
-import { EntityId } from '../../entities';
-import { archetypeFromComponents, ArchetypeMask } from './archetype';
+import type { EntityId } from '../../entities';
+import { archetypeFromComponents, type ArchetypeMask } from './archetype';
 import { archetypeMaskFor } from './archetype-mask-for';
 import { ComponentTypeIdFlagCounter } from '../component-type-id-flag-counter';
 import { EcsWorld } from '../../world';

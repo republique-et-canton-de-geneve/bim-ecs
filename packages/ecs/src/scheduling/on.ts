@@ -3,8 +3,6 @@ import { Scheduler } from './scheduler';
 import type { SchedulerCtor } from './scheduler-constructor';
 import type { ExtractEcsEventType } from '../event-bus/extract-ecs-event-type';
 import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../debug';
-import { EntityId } from '../entities';
-import { EcsComponent } from '../components';
 
 export function on<TPayload>(eventKey: EcsEvent<TPayload>): SchedulerCtor<TPayload>;
 export function on<TEvent extends EcsEvent<any>[]>(

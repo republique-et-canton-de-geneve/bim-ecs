@@ -1,4 +1,4 @@
-import { ArchetypeMaskHash, hashArchetypeMask } from './hash-archetype-mask';
+import { type ArchetypeMaskHash, hashArchetypeMask } from './hash-archetype-mask';
 import { map } from '@bim/iterable';
 import type { ArchetypeMask } from './archetype';
 

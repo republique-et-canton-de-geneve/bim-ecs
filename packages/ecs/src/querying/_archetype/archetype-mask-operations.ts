@@ -1,4 +1,4 @@
-import { ArchetypeMask } from './archetype';
+import type { ArchetypeMask } from './archetype';
 
 /**
  * Is mask1 included in mask2 ?

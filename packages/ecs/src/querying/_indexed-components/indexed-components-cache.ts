@@ -1,6 +1,6 @@
 import { EcsWorld } from '../../world';
 import { EcsComponent, EcsIndexedComponent } from '../../components';
-import { EntityId } from '../../entities';
+import type { EntityId } from '../../entities';
 import { TupleMap } from '@bim/tuple-collections';
 import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from '../../entities/entities-events';
 import { ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED } from '../../components/ecs-component-events';

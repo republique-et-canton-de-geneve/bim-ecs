@@ -1,10 +1,10 @@
-import { SchedulerCtor } from './scheduler-constructor';
+import type { SchedulerCtor } from './scheduler-constructor';
 import { Scheduler } from './scheduler';
 import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../debug';
-import { EcsComponent, EcsComponentCtor } from '../components';
+import { EcsComponent, type EcsComponentCtor } from '../components';
 import { ECS_COMPONENT_LINK_REMOVED } from '../components/ecs-component-events';
-import { EntityId } from '../entities';
-import { QueryDefinition } from '../querying/query-definition';
+import type { EntityId } from '../entities';
+import type { QueryDefinition } from '../querying/query-definition';
 import { runAtomicQueryOnSingleEntity } from '../querying/query-processing';
 import { archetypeMaskFor } from '../querying/_archetype/archetype-mask-for';
 import { compileQueryDefinition } from '../querying/compile-query';

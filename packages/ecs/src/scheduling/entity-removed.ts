@@ -1,13 +1,13 @@
-import { SchedulerCtor } from './scheduler-constructor';
+import type { SchedulerCtor } from './scheduler-constructor';
 import { Scheduler } from './scheduler';
 import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../debug';
 import { EcsComponent } from '../components';
-import { EntityId } from '../entities';
+import type { EntityId } from '../entities';
 import { ECS_ENTITY_REMOVED } from '../entities/entities-events';
-import { QueryDefinition } from '../querying/query-definition';
+import type { QueryDefinition } from '../querying/query-definition';
 import { archetypeMaskFor } from '../querying/_archetype/archetype-mask-for';
 import { map } from '@bim/iterable';
-import { Archetype } from '../querying/_archetype';
+import type { Archetype } from '../querying/_archetype';
 import { runAtomicQueryOnSingleEntity } from '../querying/query-processing';
 
 let idCounter = 0;

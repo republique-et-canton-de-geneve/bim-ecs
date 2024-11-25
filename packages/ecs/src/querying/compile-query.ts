@@ -1,4 +1,4 @@
-import { QueryDefinition } from './query-definition';
+import type { QueryDefinition } from './query-definition';
 import { QueryClr } from './_builder/query-clr';
 import { filter } from '@bim/iterable';
 import { without } from './_builder/without';

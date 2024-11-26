@@ -5,15 +5,20 @@ import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from './entities-events';
 import { ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED } from '../components/ecs-component-events';
 import { map } from '@bim/iterable';
 import type { Archetype } from '../querying/_archetype';
+import { ComponentsTracker } from '../components/components-tracker';
 
 /** Handles ECS entities life cycle */
-export class EntityPool {
+export class EntityPool implements Disposable {
   #entityIdCounter = 0;
+
+  public readonly componentsTracker;
 
   /** Entity / components association */
   public readonly componentsByEntity = new Map<EntityId, Set<EcsComponent<unknown>>>();
 
-  constructor(private readonly world: Pick<EcsWorld, 'bus'>) {}
+  constructor(private readonly world: Pick<EcsWorld, 'bus'>) {
+    this.componentsTracker = new ComponentsTracker(this.world);
+  }
 
   /**
    * Creates a new entity instance
@@ -119,5 +124,10 @@ export class EntityPool {
     }
 
     return removed;
+  }
+
+  /** @inheritDoc */
+  [Symbol.dispose]() {
+    this.componentsTracker[Symbol.dispose]();
   }
 }

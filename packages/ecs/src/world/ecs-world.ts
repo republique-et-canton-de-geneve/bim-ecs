@@ -91,6 +91,7 @@ export class EcsWorld implements Disposable {
     this.bus[Symbol.dispose]();
     this.container[Symbol.dispose]();
     this.query[Symbol.dispose]();
+    this.entities[Symbol.dispose]();
   }
 
   private verbose(type: 'info' | 'debug' | true) {

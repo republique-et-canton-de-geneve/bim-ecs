@@ -51,7 +51,10 @@ export const updatePlateSystem = defineSystem(
       const boxGeometry = components.get(BoxGeometry)! as BoxGeometry; // TODO: infer type
       const limitLeft = boxGeometry.value.width * 0.5;
       const limitRight = config.width - limitLeft;
-      boxGeometry.set({ ...boxGeometry.value, x: Math.min(limitRight, Math.max(limitLeft, payload.scenePosition.x)) });
+      boxGeometry.value = {
+        ...boxGeometry.value,
+        x: Math.min(limitRight, Math.max(limitLeft, payload.scenePosition.x)),
+      };
     }
   },
   on(pointerMoveEvent),

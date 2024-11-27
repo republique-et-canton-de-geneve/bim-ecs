@@ -41,7 +41,7 @@ export function runQueryChunkOnEntity(
 ) {
   return (
     !queryClr.withValue.length ||
-    queryClr.withValue.some((valueQuery) => indexesRepository.get(valueQuery)?.has(entity))
+    queryClr.withValue.every((valueQuery) => indexesRepository.get(valueQuery)?.has(entity))
   );
 }
 

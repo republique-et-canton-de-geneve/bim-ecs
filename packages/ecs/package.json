@@ -37,7 +37,8 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig-build.json && vite build"
+    "build": "tsc -p tsconfig-build.json && vite build",
+    "test": "vitest"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",

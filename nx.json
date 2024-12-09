@@ -6,6 +6,11 @@
         "^build"
       ]
     },
+    "test": {
+      "dependsOn": [
+        "^build"
+      ]
+    },
     "build": {
       "dependsOn": [
         "^build"

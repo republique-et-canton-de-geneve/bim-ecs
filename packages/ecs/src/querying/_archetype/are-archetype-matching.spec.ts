@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { Archetype } from './archetype';
-import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter';
+import type { Archetype } from './archetype';
 import { areArchetypeMatching } from './are-archetype-matching';
-import { EcsComponent } from '../components';
+import { EcsComponent } from '../../components';
+import { ComponentTypeIdFlagCounter } from '../component-type-id-flag-counter';
 
 describe('areArchetypeMatching', () => {
   it('should return true for matching archetypes, even if order is different', () => {

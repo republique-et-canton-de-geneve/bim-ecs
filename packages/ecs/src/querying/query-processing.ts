@@ -16,12 +16,13 @@ import { TupleMap } from '@bim/tuple-collections';
  * @returns true if the mask matches the query, false otherwise
  */
 export function runQueryChunkOnArchetypeMask(
-  queryClr: Pick<QueryClr, 'with' | 'without'>,
+  queryClr: Pick<QueryClr, 'with' | 'without' | 'withValueComponents'>,
   mask: ArchetypeMask,
   counter: ComponentTypeIdFlagCounter,
 ) {
   return (
     archetypeMaskIncluded(archetypeMaskFor(queryClr.with, counter), mask) && // "with" processing
+    archetypeMaskIncluded(archetypeMaskFor(queryClr.withValueComponents, counter), mask) && // "withValueComponents" processing
     archetypeMaskExcluded(archetypeMaskFor(queryClr.without, counter), mask) // "without" processing
   );
 }
@@ -34,7 +35,7 @@ export function runQueryChunkOnArchetypeMask(
  * @param indexesRepository The index repository
  * @returns true if entity matches the query, false otherwise
  */
-export function runQueryChunkOnEntity(
+export function runQueryChunkOnIndexEntity(
   entity: EntityId,
   queryClr: Pick<QueryClr, 'withValue'>,
   indexesRepository: TupleMap<[typeof EcsIndexedComponent<any>, any], Set<EntityId>>,
@@ -56,6 +57,6 @@ export function runAtomicQueryOnSingleEntity(
 ) {
   return (
     runQueryChunkOnArchetypeMask(queryClr, entityBundle.componentsMask, context.counter) &&
-    runQueryChunkOnEntity(entityBundle.entity, queryClr, context.indexesRepository)
+    runQueryChunkOnIndexEntity(entityBundle.entity, queryClr, context.indexesRepository)
   );
 }

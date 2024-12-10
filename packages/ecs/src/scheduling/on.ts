@@ -20,18 +20,14 @@ export function on<TPayload>(eventKey: EcsEvent<TPayload> | EcsEvent<any>[]): Sc
     /** Pending event payloads */
     readonly #eventPayloadsQueue: TPayload[] = [];
 
-    #unsubscribe: Function[] = (Array.isArray(eventKey) ? eventKey : [eventKey]).map((eventItem) =>
-      this.world.bus.subscribe(eventItem, (payload) => {
-        if (this.#resolveNext) {
-          // Executing immediately
-          this.#resolveNext(payload);
-          this.#resolveNext = null;
-        } else {
-          // Stacking data
-          this.#eventPayloadsQueue.push(payload);
-        }
-      }),
-    );
+    /** @inheritdoc */
+    public run(next: (payload: TPayload) => void, dispose: () => void) {
+      this.#unsubscribe = (Array.isArray(eventKey) ? eventKey : [eventKey]).map((eventItem) =>
+        this.world.bus.subscribe(eventItem, (payload) => next(payload)),
+      );
+    }
+
+    #unsubscribe: Function[] | undefined = undefined;
 
     get [DEBUG_NAME]() {
       return Array.isArray(eventKey)
@@ -49,31 +45,10 @@ export function on<TPayload>(eventKey: EcsEvent<TPayload> | EcsEvent<any>[]): Sc
     }
 
     /** @inheritdoc */
-    getIteratorImplementation() {
-      const setResolver = (resolver: (value: TPayload) => void) => {
-        if (this.#eventPayloadsQueue.length) {
-          // Available stacked data
-          resolver(this.#eventPayloadsQueue.shift()!);
-        } else {
-          // Nothing stacked. Awaiting next data
-          this.#resolveNext = resolver;
-        }
-      };
-
-      return {
-        /** @inheritdoc */
-        next() {
-          return new Promise<IteratorResult<TPayload>>((resolve) => {
-            /** @inheritdoc */
-            setResolver((value) => resolve({ value, done: false }));
-          });
-        },
-      };
-    }
-
-    /** @inheritdoc */
     [Symbol.dispose]() {
-      this.#unsubscribe.forEach((unsubscribe) => unsubscribe());
+      this.#unsubscribe?.forEach((unsubscribe) => unsubscribe());
+      this.#unsubscribe = undefined;
+
       super[Symbol.dispose]();
     }
   };

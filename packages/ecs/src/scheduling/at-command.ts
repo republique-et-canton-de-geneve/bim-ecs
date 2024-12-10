@@ -10,22 +10,18 @@ import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable }
  */
 export function atCommand<TPayload>(commandKey: EcsCommand<TPayload>): SchedulerCtor<any> {
   return class extends Scheduler<TPayload> implements Debuggable {
-    #resolveNext: ((value: TPayload) => void) | null = null;
+    /** @inheritdoc */
+    public run(next: (payload: TPayload) => void) {
+      this.#unsubscribe = this.world.bus.subscribe(ECS_COMMAND_EVENT, (args) => {
+        // Filtering
+        if (args.command !== commandKey) return;
 
-    /** Pending event payloads */
-    readonly #eventPayloadsQueue: TPayload[] = [];
+        // Processing next step
+        next(args.payload);
+      });
+    }
 
-    #unsubscribe: Function = this.world.bus.subscribe(ECS_COMMAND_EVENT, (args) => {
-      if (args.command !== commandKey) return;
-      if (this.#resolveNext) {
-        // Executing immediately
-        this.#resolveNext(args.payload);
-        this.#resolveNext = null;
-      } else {
-        // Stacking data
-        this.#eventPayloadsQueue.push(args.payload);
-      }
-    });
+    #unsubscribe: Function | undefined = undefined;
 
     get [DEBUG_NAME]() {
       return (commandKey as Symbol).description ?? '#no name';
@@ -39,31 +35,9 @@ export function atCommand<TPayload>(commandKey: EcsCommand<TPayload>): Scheduler
     }
 
     /** @inheritdoc */
-    getIteratorImplementation() {
-      const setResolver = (resolver: (value: TPayload) => void) => {
-        if (this.#eventPayloadsQueue.length) {
-          // Available stacked data
-          resolver(this.#eventPayloadsQueue.shift()!);
-        } else {
-          // Nothing stacked. Awaiting next data
-          this.#resolveNext = resolver;
-        }
-      };
-
-      return {
-        /** @inheritdoc */
-        next() {
-          return new Promise<IteratorResult<TPayload>>((resolve) => {
-            /** @inheritdoc */
-            setResolver((value) => resolve({ value, done: false }));
-          });
-        },
-      };
-    }
-
-    /** @inheritdoc */
     [Symbol.dispose]() {
-      this.#unsubscribe();
+      this.#unsubscribe?.();
+      this.#unsubscribe = undefined;
       super[Symbol.dispose]();
     }
   };

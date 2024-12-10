@@ -52,8 +52,8 @@ export class EcsWorld implements Disposable {
   public run() {
     if (this.systems.isRunning) return this;
 
-    this.bus.publish(ECS_WORLD_RUNNING_EVENT, { time: Date.now() });
     this.systems.run();
+    this.bus.publish(ECS_WORLD_RUNNING_EVENT, { time: Date.now() });
 
     return this;
   }

@@ -5,7 +5,7 @@ import { spawned } from './entity-spawned';
 import { EcsComponent } from '../components';
 
 describe('spawned', () => {
-  it('should trigger once the bound system', async () => {
+  it('should trigger once the bound system', () => {
     class Component1 extends EcsComponent {}
 
     let fooCount = 0;
@@ -20,13 +20,12 @@ describe('spawned', () => {
       .run();
 
     world.entities.spawn(new Component1());
-    await new Promise((resolve) => setTimeout(resolve)); // awaits macrotask
     world.stop();
 
     expect(fooCount).toBe(1);
   });
 
-  it('should trigger 3 times the system', async () => {
+  it('should trigger 3 times the system', () => {
     class Component1 extends EcsComponent {}
 
     let fooCount = 0;
@@ -43,7 +42,6 @@ describe('spawned', () => {
     world.entities.spawn(new Component1());
     world.entities.spawn(new Component1());
     world.entities.spawn(new Component1());
-    await new Promise((resolve) => setTimeout(resolve)); // awaits macrotask
     world.stop();
 
     expect(fooCount).toBe(3);

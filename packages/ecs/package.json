@@ -38,17 +38,20 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig-build.json && vite build",
-    "test": "vitest"
+    "test": "vitest",
+    "test:browser": "vitest --browser"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.9.0",
+    "@vitest/browser":  "^2.1.8",
     "typescript": "~5.6.2",
     "vite": "^5.4.10",
     "vitest": "^2.1.4",
     "vite-plugin-dts": "^4.3.0",
     "jsdom": "^24.1.0",
-    "glob": "11.0.0"
+    "glob": "11.0.0",
+    "playwright": "^1.49.1"
   },
   "dependencies": {
     "@bim/iterable": "^0.0.0",

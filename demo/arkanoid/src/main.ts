@@ -1,4 +1,4 @@
-import { EcsWorld } from '@bim/ecs';
+import { EcsWorld } from 'bim-ecs';
 import { eventsHandlingPlugin } from './inputs-binding';
 import { renderingPlugin } from './rendering';
 import { bricksPlugin } from './brick';

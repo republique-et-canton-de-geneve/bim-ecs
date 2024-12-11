@@ -1,12 +1,12 @@
-import { defineSystem, EcsPlugin } from '@bim/ecs';
-import { on, startup } from '@bim/ecs/scheduling';
+import { defineSystem, EcsPlugin } from 'bim-ecs';
+import { on, startup } from 'bim-ecs/scheduling';
 import { Config } from './config';
-import { EcsComponent } from '@bim/ecs/components';
+import { EcsComponent } from 'bim-ecs/components';
 import { BoxGeometry } from './box-geometry';
 import { pointerMoveEvent } from './inputs';
 import { Name } from './common';
-import { EcsEvent } from '@bim/ecs/event-bus';
-import { EntityId } from '@bim/ecs/entities';
+import { EcsEvent } from '@bim-ecs/event-bus';
+import { EntityId } from '@bim-ecs/entities';
 import { BallCollisionTrigger } from './ball-collision-trigger';
 import { Velocity } from './velocity';
 

@@ -6,7 +6,7 @@ import type { EntityId } from '../entities';
 import { ECS_ENTITY_REMOVED } from '../entities/entities-events';
 import type { QueryDefinition } from '../querying/query-definition';
 import { archetypeMaskFor } from '../querying/_archetype/archetype-mask-for';
-import { map } from '@bim/iterable';
+import { map } from '@bim-ecs/iterable';
 import type { Archetype } from '../querying/_archetype';
 import { runAtomicQueryOnSingleEntity } from '../querying/query-processing';
 

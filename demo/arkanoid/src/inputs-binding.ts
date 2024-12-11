@@ -1,5 +1,5 @@
-import { EcsPlugin, defineSystem } from '@bim/ecs';
-import { after } from '@bim/ecs/scheduling';
+import { EcsPlugin, defineSystem } from 'bim-ecs';
+import { after } from 'bim-ecs/scheduling';
 import { pointerMoveEvent } from './inputs';
 import { initializeSceneSystem } from './rendering';
 

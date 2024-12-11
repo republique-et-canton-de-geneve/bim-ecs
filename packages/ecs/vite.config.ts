@@ -2,9 +2,20 @@ import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import { resolve, join } from 'path';
 import { glob } from 'glob';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
-  plugins: [dts({ include: ['src'], tsconfigPath: join(__dirname, 'tsconfig-build.json') })],
+  plugins: [
+    dts({ include: ['src'], tsconfigPath: join(__dirname, 'tsconfig-build.json') }),
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'package.json',
+          dest: '.', // Destination relative to `outDir`
+        },
+      ],
+    }),
+  ],
   build: {
     copyPublicDir: false,
     // lib: {

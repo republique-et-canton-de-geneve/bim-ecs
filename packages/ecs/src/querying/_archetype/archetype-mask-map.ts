@@ -1,5 +1,5 @@
 import { type ArchetypeMaskHash, hashArchetypeMask } from './hash-archetype-mask';
-import { map } from '@bim/iterable';
+import { map } from '@bim-ecs/iterable';
 import type { ArchetypeMask } from './archetype';
 
 /** Handles values mapping by `ArchetypeMask` */

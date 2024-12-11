@@ -5,7 +5,7 @@ import { archetypeMaskFor } from './_archetype/archetype-mask-for';
 import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter';
 import type { EntityId } from '../entities';
 import { EcsIndexedComponent } from '../components';
-import { TupleMap } from '@bim/tuple-collections';
+import { TupleMap } from '@bim-ecs/tuple-collections';
 
 /**
  * Processes query onto archetype mask

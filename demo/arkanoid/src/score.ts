@@ -1,6 +1,6 @@
-import { EcsResource } from '@bim/ecs/resources';
-import { defineSystem, EcsPlugin } from '@bim/ecs';
-import { componentAdded } from '@bim/ecs/scheduling';
+import { EcsResource } from 'bim-ecs/resources';
+import { defineSystem, EcsPlugin } from 'bim-ecs';
+import { componentAdded } from 'bim-ecs/scheduling';
 import { Disabled } from './disabling';
 import { Brick } from './brick';
 

@@ -9,7 +9,7 @@ let i = 0;
  * Creates a scheduler aggregation
  * @param schedulersConstructors Scheduler to aggregate
  */
-export function compose(...schedulersConstructors: ReadonlyArray<SchedulerCtor<any>>) {
+export function compose(...schedulersConstructors: ReadonlyArray<SchedulerCtor<any>>): SchedulerCtor<any> {
   return class extends Scheduler<any> implements Debuggable {
     #_internalId = i++;
 

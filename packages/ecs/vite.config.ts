@@ -29,13 +29,28 @@ export default defineConfig({
       preserveEntrySignatures: 'exports-only',
       input: getEntryPoints(),
 
-      output: {
-        // entryFileNames: '[name].js', // Ensures the output files retain their base names
-        entryFileNames: (chunkInfo) => {
-          console.log('chunkInfo', chunkInfo);
-          return `${chunkInfo.name.replace('src\\', '')}.js`;
-        }, // Ensures the output files retain their base names
-      },
+      output: [
+        {
+          // ESM output
+          format: 'es',
+          entryFileNames: (chunkInfo) => `${chunkInfo.name.replace('src\\', '')}.js`,
+          dir: 'dist', // Output directory for ESM
+          preserveModules: true, // Keeps the module structure for tree-shaking
+          exports: 'named',
+        },
+        {
+          // CJS output
+          format: 'cjs',
+          entryFileNames: (chunkInfo) => `${chunkInfo.name.replace('src\\', '')}.cjs`,
+          dir: 'dist', // Output directory for CJS
+          preserveModules: true,
+          exports: 'named',
+        },
+      ],
+    },
+
+    lib: {
+      entry: resolve(__dirname, 'src/index.ts'),
     },
   },
 });

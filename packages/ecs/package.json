@@ -1,5 +1,5 @@
 {
-  "name": "@bim/ecs",
+  "name": "bim-ecs",
   "author": "Etat de Genève",
   "description": "Typescript ECS library implementation",
   "keywords": [
@@ -54,7 +54,7 @@
     "playwright": "^1.49.1"
   },
   "dependencies": {
-    "@bim/iterable": "^0.0.0",
-    "@bim/tuple-collections": "^0.0.0"
+    "@bim-ecs/iterable": "^0.0.0",
+    "@bim-ecs/tuple-collections": "^0.0.0"
   }
 }

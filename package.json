@@ -1,5 +1,4 @@
 {
-  "name": "bim-ecs",
   "author": "Etat de Genève",
   "description": "Typescript ECS library implementation",
   "keywords": [
@@ -14,6 +13,7 @@
   "version": "0.0.0",
   "workspaces": [
     "./packages/*",
+    "./libs/*",
     "./demo/*"
   ],
   "scripts": {

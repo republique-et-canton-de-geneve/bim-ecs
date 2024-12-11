@@ -1,0 +1,44 @@
+{
+  "name": "@bim-ecs/grouped-component-plugin",
+  "author": "Etat de Genève",
+  "description": "bim-ecs plugin for grouped components",
+  "keywords": [
+    "ECS",
+    "Game engine",
+    "typescript",
+    "javascript",
+    "BIM"
+  ],
+  "private": false,
+  "version": "0.0.0",
+  "type": "module",
+  "license": "Apache-2.0",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.es.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig-build.json && vite build",
+    "test": "vitest",
+    "test:browser": "vitest --browser"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^22.9.0",
+    "@vitest/browser":  "^2.1.8",
+    "typescript": "~5.6.2",
+    "vite": "^5.4.10",
+    "vitest": "^2.1.4",
+    "vite-plugin-dts": "^4.3.0",
+    "jsdom": "^24.1.0",
+    "glob": "11.0.0",
+    "playwright": "^1.49.1",
+    "vite-plugin-static-copy": "2.2.0"
+  },
+  "peerDependencies": {
+    "bim-ecs": "^0.0.0"
+  }
+}

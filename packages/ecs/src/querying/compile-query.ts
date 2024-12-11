@@ -1,6 +1,6 @@
 import type { QueryDefinition } from './query-definition';
 import { QueryClr } from './_builder/query-clr';
-import { filter } from '@bim/iterable';
+import { filter } from '@bim-ecs/iterable';
 import { without } from './_builder/without';
 import { withValue } from './_builder/with-value';
 import { withComponent } from './_builder/with-component';

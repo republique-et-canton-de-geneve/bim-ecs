@@ -34,46 +34,49 @@ export function componentValueChanged<TValue, TComponent extends EcsMutableCompo
       newValue: TValue;
     }[] = [];
 
-    #unsubscribe: Function = this.world.bus.subscribe(ECS_MUTABLE_COMPONENT_VALUE_CHANGED, (args) => {
-      if (
-        // Component type check
-        args.component.constructor !== componentType ||
-        // (Optionally) Query check
-        (query &&
-          [...args.entities].every(
-            (entity) =>
-              !runAtomicQueryOnSingleEntity(
-                {
-                  entity,
-                  componentsMask: archetypeMaskFor(
-                    this.world.entities.componentsOf(entity).keys(),
-                    this.world.query.archetypeCache.counter,
-                  ),
-                },
-                compileQueryDefinition(query),
-                {
-                  counter: this.world.query.archetypeCache.counter,
-                  indexesRepository: this.world.query.indexedComponentsCache.entitiesByComponentValues,
-                },
-              ),
-          ))
-      ) {
-        return; // Not candidate
-      }
+    /** @inheritdoc */
+    public run(
+      next: (payload: {
+        component: TComponent;
+        entities: Iterable<EntityId>;
+        oldValue: TValue;
+        newValue: TValue;
+      }) => void,
+    ) {
+      this.#unsubscribe = this.world.bus.subscribe(ECS_MUTABLE_COMPONENT_VALUE_CHANGED, (args) => {
+        // Filtering
+        if (
+          // Component type check
+          args.component.constructor !== componentType ||
+          // (Optionally) Query check
+          (query &&
+            [...args.entities].every(
+              (entity) =>
+                !runAtomicQueryOnSingleEntity(
+                  {
+                    entity,
+                    componentsMask: archetypeMaskFor(
+                      this.world.entities.componentsOf(entity).keys(),
+                      this.world.query.archetypeCache.counter,
+                    ),
+                  },
+                  compileQueryDefinition(query),
+                  {
+                    counter: this.world.query.archetypeCache.counter,
+                    indexesRepository: this.world.query.indexedComponentsCache.entitiesByComponentValues,
+                  },
+                ),
+            ))
+        ) {
+          return; // Not candidate
+        }
 
-      if (this.#resolveNext) {
-        // Executing immediately
-        this.#resolveNext(
-          args as { component: TComponent; entities: Iterable<EntityId>; oldValue: TValue; newValue: TValue },
-        );
-        this.#resolveNext = null;
-      } else {
-        // Stacking data
-        this.#eventPayloadsQueue.push(
-          args as { component: TComponent; entities: Iterable<EntityId>; oldValue: TValue; newValue: TValue },
-        );
-      }
-    });
+        // Next step processing
+        next(args as { component: TComponent; entities: Iterable<EntityId>; oldValue: TValue; newValue: TValue });
+      });
+    }
+
+    #unsubscribe: Function | undefined = undefined;
 
     get [DEBUG_NAME]() {
       return componentType.name ?? '#no name';
@@ -87,40 +90,9 @@ export function componentValueChanged<TValue, TComponent extends EcsMutableCompo
     }
 
     /** @inheritdoc */
-    getIteratorImplementation() {
-      const setResolver = (
-        resolver: (value: {
-          component: TComponent;
-          entities: Iterable<EntityId>;
-          oldValue: TValue;
-          newValue: TValue;
-        }) => void,
-      ) => {
-        if (this.#eventPayloadsQueue.length) {
-          // Available stacked data
-          resolver(this.#eventPayloadsQueue.shift()!);
-        } else {
-          // Nothing stacked. Awaiting next data
-          this.#resolveNext = resolver;
-        }
-      };
-
-      return {
-        /** @inheritdoc */
-        next() {
-          return new Promise<
-            IteratorResult<{ component: TComponent; entities: Iterable<EntityId>; oldValue: TValue; newValue: TValue }>
-          >((resolve) => {
-            /** @inheritdoc */
-            setResolver((value) => resolve({ value, done: false }));
-          });
-        },
-      };
-    }
-
-    /** @inheritdoc */
     [Symbol.dispose]() {
-      this.#unsubscribe();
+      this.#unsubscribe?.();
+      this.#unsubscribe = undefined;
       super[Symbol.dispose]();
     }
   };

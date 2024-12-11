@@ -1,6 +1,6 @@
-import { EcsComponent } from '@bim/ecs/components';
-import { defineSystem, EcsPlugin } from '@bim/ecs';
-import { frame, startup } from '@bim/ecs/scheduling';
+import { EcsComponent } from 'bim-ecs/components';
+import { defineSystem, EcsPlugin } from 'bim-ecs';
+import { frame, startup } from 'bim-ecs/scheduling';
 import { BoxGeometry } from './box-geometry';
 import { Config } from './config';
 import { Name } from './common';

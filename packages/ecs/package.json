@@ -1,5 +1,5 @@
 {
-  "name": "@bim/ecs",
+  "name": "bim-ecs",
   "author": "Etat de Genève",
   "description": "Typescript ECS library implementation",
   "keywords": [
@@ -15,43 +15,66 @@
   "license": "Apache-2.0",
   "exports": {
     ".": {
-      "import": "./dist/index.js"
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./resources": {
-      "import": "./dist/resources/index.js"
+      "require": "./dist/resources/index.cjs",
+      "import": "./dist/resources/index.js",
+      "types": "./dist/resources/index.d.ts"
     },
     "./systems": {
-      "import": "./dist/systems/index.js"
+      "require": "./dist/systems/index.cjs",
+      "import": "./dist/systems/index.js",
+      "types": "./dist/systems/index.d.ts"
     },
     "./event-bus": {
-      "import": "./dist/event-bus/index.js"
+      "require": "./dist/event-bus/index.cjs",
+      "import": "./dist/event-bus/index.js",
+      "types": "./dist/event-bus/index.d.ts"
     },
     "./scheduling": {
-      "import": "./dist/scheduling/index.js"
+      "require": "./dist/scheduling/index.cjs",
+      "import": "./dist/scheduling/index.js",
+      "types": "./dist/scheduling/index.d.ts"
+    },
+    "./scheduling/modifiers": {
+      "require": "./dist/scheduling/modifiers/index.cjs",
+      "import": "./dist/scheduling/modifiers/index.js",
+      "types": "./dist/scheduling/modifiers/index.d.ts"
     },
     "./components": {
-      "import": "./dist/components/index.js"
+      "require": "./dist/components/index.cjs",
+      "import": "./dist/components/index.js",
+      "types": "./dist/components/index.d.ts"
     },
     "./entities": {
-      "import": "./dist/entities/index.js"
+      "require": "./dist/entities/index.cjs",
+      "import": "./dist/entities/index.js",
+      "types": "./dist/entities/index.d.ts"
     }
   },
   "scripts": {
     "build": "tsc -p tsconfig-build.json && vite build",
-    "test": "vitest"
+    "test": "vitest",
+    "test:browser": "vitest --browser"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.9.0",
+    "@vitest/browser":  "^2.1.8",
     "typescript": "~5.6.2",
     "vite": "^5.4.10",
     "vitest": "^2.1.4",
     "vite-plugin-dts": "^4.3.0",
     "jsdom": "^24.1.0",
-    "glob": "11.0.0"
+    "glob": "11.0.0",
+    "playwright": "^1.49.1",
+    "vite-plugin-static-copy": "2.2.0"
   },
   "dependencies": {
-    "@bim/iterable": "^0.0.0",
-    "@bim/tuple-collections": "^0.0.0"
+    "@bim-ecs/iterable": "^0.0.0",
+    "@bim-ecs/tuple-collections": "^0.0.0"
   }
 }

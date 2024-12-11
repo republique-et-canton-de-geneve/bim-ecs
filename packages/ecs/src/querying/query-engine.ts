@@ -1,5 +1,5 @@
 import { EcsWorld } from '../world';
-import { filter, flatMap } from '@bim/iterable';
+import { filter, flatMap } from '@bim-ecs/iterable';
 import { ArchetypeCache } from './_archetype/archetype-cache';
 import type { QueryDefinition } from './query-definition';
 import { runQueryChunkOnArchetypeMask } from './query-processing';
@@ -74,8 +74,8 @@ export class QueryEngine implements Disposable {
     /** Smallest indexed entity set matching current query (entity sets needs to be intersected) */
     let smallestIndexedEntitySet = null as Set<EntityId> | null;
     const fromIndexesEntitySetsResult = queryClr.withValue.map((withValueEntry) => {
-      const entities = this.indexedComponentsCache.entitiesByComponentValues.get(withValueEntry)!;
-      if (entities.size < (smallestIndexedEntitySet?.size ?? Number.MAX_SAFE_INTEGER)) {
+      const entities = this.indexedComponentsCache.entitiesByComponentValues.get(withValueEntry);
+      if (entities && entities.size < (smallestIndexedEntitySet?.size ?? Number.MAX_SAFE_INTEGER)) {
         smallestIndexedEntitySet = entities;
       }
 
@@ -118,7 +118,7 @@ export class QueryEngine implements Disposable {
     /** Strategy using only indexes as input for query processing */
     function runQueryFromIndexesOnlyStrategy() {
       return filter(smallestIndexedEntitySet!, (entity) =>
-        largerIndexesEntitySetsResult.every((set) => set!.has(entity)),
+        largerIndexesEntitySetsResult.every((set) => set?.has(entity)),
       );
     }
 
@@ -127,7 +127,7 @@ export class QueryEngine implements Disposable {
       return filter(
         archetypeEntitySet,
         (entity) =>
-          smallestIndexedEntitySet?.has(entity) && largerIndexesEntitySetsResult.every((set) => set!.has(entity)), // Starting with the smallest set to maximize chances not to go through "every statement"
+          smallestIndexedEntitySet?.has(entity) && largerIndexesEntitySetsResult.every((set) => set?.has(entity)), // Starting with the smallest set to maximize chances not to go through "every statement"
       );
     }
 
@@ -135,7 +135,7 @@ export class QueryEngine implements Disposable {
     function runQueryFromIndexesStrategy() {
       return filter(
         smallestIndexedEntitySet!,
-        (entity) => archetypeEntitySet.has(entity) && largerIndexesEntitySetsResult.every((set) => set!.has(entity)),
+        (entity) => archetypeEntitySet.has(entity) && largerIndexesEntitySetsResult.every((set) => set?.has(entity)),
       );
     }
   }

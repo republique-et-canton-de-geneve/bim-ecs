@@ -1,85 +1,79 @@
-import type { SchedulerCtor } from '../scheduler-constructor'
-import { Scheduler } from '../scheduler'
-import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE } from '../../debug'
+import type { SchedulerCtor } from '../scheduler-constructor';
+import { Scheduler } from '../scheduler';
+import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE } from '../../debug';
 
-let i = 0
+let i = 0;
 
 /**
  * Debounce scheduler items
  * @param schedulersConstructor The scheduler to be transformed
  * @param delay The debounce delay in ms
  */
-export function debounce<T>(
-  schedulersConstructor: SchedulerCtor<T>,
-  delay: number,
-): SchedulerCtor<T> {
+export function debounce<T>(schedulersConstructor: SchedulerCtor<T>, delay: number): SchedulerCtor<T> {
   return class extends Scheduler<T> {
-    #_internalId = i++
+    #_internalId = i++;
+    #debounceTimer: NodeJS.Timeout | null = null;
+    #lastPayload: T | undefined = undefined;
 
-    readonly #scheduler: Scheduler<T> = new schedulersConstructor(this.world, this)
-    #resolveFn: Function | null = null
+    readonly #scheduler: Scheduler<T> = new schedulersConstructor(this.world, this);
 
     get [DEBUG_NAME]() {
-      return `debounce ${delay}ms`
+      return `debounce ${delay}ms`;
     }
-    readonly [DEBUG_TYPE] = '🎚'
+    readonly [DEBUG_TYPE] = '🎚';
     get [DEBUG_ID]() {
-      return `debounce_${delay}_${this.#_internalId}`
+      return `debounce_${delay}_${this.#_internalId}`;
     }
     get [DEBUG_DEPENDENCIES]() {
-      return [this.#scheduler]
+      return [this.#scheduler];
     }
 
     /** @inheritdoc */
-    async *getIteratorImplementation() {
-      let rejectFn: Function | null = null
-      let done = false
+    public run(next: (payload: T) => void, dispose: () => void): void {
+      let markedAsDisposed = false;
 
-      /** Creates a new deferral value */
-      const createDeferral = () =>
-        new Promise<T>((resolve, reject) => {
-          this.#resolveFn = resolve
-          rejectFn = reject
-        })
-
-      /** Deferred iteration item */
-      let deferredResult = createDeferral()
-
-      /** TimeoutId to be reset if an iteration occurres before specified delay */
-      let timeoutId: ReturnType<typeof setTimeout> | undefined = undefined
-
-      /** Loops onto every entry stream items */
-      const loop = async () => {
-        for await (const item of this.#scheduler) {
-          // Disposal management
-          if (this.disposed) return
-
-          // Debounced resolution
-          clearTimeout(timeoutId)
-          timeoutId = setTimeout(() => this.#resolveFn!(item), delay)
+      const tryDispose = () => {
+        if (markedAsDisposed && !this.#debounceTimer) {
+          dispose();
         }
-      }
+      };
 
-      // Background looping task
-      loop()
-        .catch(rejectFn)
-        .then(() => (done = true))
+      const handleChildDispose = () => {
+        markedAsDisposed = true;
+        tryDispose();
+      };
 
-      // Streamed data iteration
-      while (!done && !this.disposed) {
-        const result = await deferredResult
-        if (!this.disposed) yield result
-        deferredResult = createDeferral()
-      }
+      const handleChildNext = (payload: T) => {
+        if (this.disposed) return;
+
+        this.#lastPayload = payload;
+
+        if (this.#debounceTimer) {
+          clearTimeout(this.#debounceTimer);
+        }
+
+        this.#debounceTimer = setTimeout(() => {
+          if (this.#debounceTimer !== null) {
+            next(this.#lastPayload as T);
+            this.#debounceTimer = null;
+            tryDispose();
+          }
+        }, delay);
+      };
+
+      this.#scheduler.run(handleChildNext, handleChildDispose);
     }
 
     /** @inheritdoc */
     [Symbol.dispose]() {
       // Updates the dispose state
-      super[Symbol.dispose]()
+      super[Symbol.dispose]();
 
-      // Unlock the last deferred element (won't pop because of the disposed state) to terminate process without leak
-      this.#resolveFn?.()
+      // Unlock the last deferred element (if any) to terminate process without leak
+      if (this.#debounceTimer !== null) {
+        clearTimeout(this.#debounceTimer);
+        this.#debounceTimer = null;
+      }
     }
-  }
+  };
 }

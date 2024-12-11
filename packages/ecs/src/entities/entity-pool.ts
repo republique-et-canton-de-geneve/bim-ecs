@@ -3,7 +3,7 @@ import type { EcsComponent, EcsComponentCtor } from '../components';
 import { EcsWorld } from '../world';
 import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from './entities-events';
 import { ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED } from '../components/ecs-component-events';
-import { map } from '@bim/iterable';
+import { map } from '@bim-ecs/iterable';
 import type { Archetype } from '../querying/_archetype';
 import { ComponentsTracker } from '../components/components-tracker';
 

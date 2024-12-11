@@ -1,30 +1,29 @@
-import { type SystemRunner } from './system-runner'
-import { EcsWorld } from '../world'
-import type { SystemDefinition } from './system-definition'
-import type { defineMixin } from './define-mixin'
-import type { EcsCommand } from './commands'
-import { ECS_COMMAND_EVENT } from './commands/command-events'
+import { type SystemRunner } from './system-runner';
+import { EcsWorld } from '../world';
+import type { SystemDefinition } from './system-definition';
+import type { EcsCommand } from './commands';
+import { ECS_COMMAND_EVENT } from './commands/command-events';
 
 /** Handles system pool running state */
 export class EcsSystemsPool implements Disposable {
-  #isRunning = false
+  #isRunning = false;
 
   /** Determines whether the systems are running */
   get isRunning() {
-    return this.#isRunning
+    return this.#isRunning;
   }
 
   constructor(private readonly world: EcsWorld) {}
 
-  readonly #systems = new Map<number, SystemRunner<any>>()
+  readonly #systems = new Map<number, SystemRunner<any>>();
 
   /**
    * Registers specified system
    * @param systemDefinition The system definition to be registered
    */
   public registerSystem(systemDefinition: SystemDefinition<any>) {
-    const definition = systemDefinition(this.world)
-    this.#systems.set(definition.id, definition)
+    const definition = systemDefinition(this.world);
+    this.#systems.set(definition.id, definition);
   }
 
   /**
@@ -33,7 +32,7 @@ export class EcsSystemsPool implements Disposable {
    * @param payload The payload
    */
   public triggerCommand<TPayload>(command: EcsCommand<TPayload>, payload?: TPayload) {
-    this.world.bus.publish(ECS_COMMAND_EVENT, { command, payload })
+    this.world.bus.publish(ECS_COMMAND_EVENT, { command, payload });
   }
 
   /**
@@ -41,28 +40,28 @@ export class EcsSystemsPool implements Disposable {
    * @param id THe system identifier
    */
   public get(id: number) {
-    return this.#systems.get(id)
+    return this.#systems.get(id);
   }
 
   /** Runs registered systems */
   public run() {
-    if (this.#isRunning) return
+    if (this.#isRunning) return;
 
-    this.#isRunning = true
-    this.#systems.forEach((system) => system.run())
+    this.#isRunning = true;
+    this.#systems.forEach((system) => system.run());
   }
 
   /** Interrupts registered systems */
   public stop() {
-    if (!this.#isRunning) return
+    if (!this.#isRunning) return;
 
-    this.#isRunning = false
-    this.#systems.forEach((system) => system.stop())
+    this.#isRunning = false;
+    this.#systems.forEach((system) => system.stop());
   }
 
   /** @inheritdoc */
   [Symbol.dispose]() {
-    this.#systems.forEach((system) => system[Symbol.dispose]())
+    this.#systems.forEach((system) => system[Symbol.dispose]());
   }
   //
   // /**

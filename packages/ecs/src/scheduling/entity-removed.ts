@@ -6,7 +6,7 @@ import type { EntityId } from '../entities';
 import { ECS_ENTITY_REMOVED } from '../entities/entities-events';
 import type { QueryDefinition } from '../querying/query-definition';
 import { archetypeMaskFor } from '../querying/_archetype/archetype-mask-for';
-import { map } from '@bim/iterable';
+import { map } from '@bim-ecs/iterable';
 import type { Archetype } from '../querying/_archetype';
 import { runAtomicQueryOnSingleEntity } from '../querying/query-processing';
 
@@ -23,36 +23,32 @@ export function entityRemoved(
     readonly #queryClr = this.world.query.compile(query);
     readonly #id = idCounter++;
 
-    #resolveNext: ((value: { entity: EntityId; components: Iterable<EcsComponent<any>> }) => void) | null = null;
+    /** @inheritdoc */
+    public run(next: (payload: { entity: EntityId; components: Iterable<EcsComponent<any>> }) => void) {
+      // Filtering
+      // noinspection JSPotentiallyInvalidUsageOfThis
+      this.#unsubscribe = this.world.bus.subscribe(ECS_ENTITY_REMOVED, (args) => {
+        const archetype = map(args.components, (component) => component.constructor) as Archetype;
+        const queryMatchesEntity = runAtomicQueryOnSingleEntity(
+          {
+            entity: args.entity,
+            componentsMask: archetypeMaskFor(archetype, this.world.query.archetypeCache.counter),
+          },
+          this.#queryClr,
+          {
+            counter: this.world.query.archetypeCache.counter,
+            indexesRepository: this.world.query.indexedComponentsCache.entitiesByComponentValues,
+          },
+        );
 
-    /** Pending event payloads */
-    readonly #eventPayloadsQueue: { entity: EntityId; components: Iterable<EcsComponent<any>> }[] = [];
+        if (!queryMatchesEntity) return;
 
-    #unsubscribe: Function = this.world.bus.subscribe(ECS_ENTITY_REMOVED, (args) => {
-      const archetype = map(args.components, (component) => component.constructor) as Archetype;
-      const queryMatchesEntity = runAtomicQueryOnSingleEntity(
-        {
-          entity: args.entity,
-          componentsMask: archetypeMaskFor(archetype, this.world.query.archetypeCache.counter),
-        },
-        this.#queryClr,
-        {
-          counter: this.world.query.archetypeCache.counter,
-          indexesRepository: this.world.query.indexedComponentsCache.entitiesByComponentValues,
-        },
-      );
+        // Next step processing
+        next(args);
+      });
+    }
 
-      if (!queryMatchesEntity) return;
-
-      if (this.#resolveNext) {
-        // Executing immediately
-        this.#resolveNext(args);
-        this.#resolveNext = null;
-      } else {
-        // Stacking data
-        this.#eventPayloadsQueue.push(args);
-      }
-    });
+    #unsubscribe: Function | undefined = undefined;
 
     get [DEBUG_NAME]() {
       return query.name ?? '#no name';
@@ -66,35 +62,10 @@ export function entityRemoved(
     }
 
     /** @inheritdoc */
-    getIteratorImplementation() {
-      const setResolver = (
-        resolver: (value: { entity: EntityId; components: Iterable<EcsComponent<any>> }) => void,
-      ) => {
-        if (this.#eventPayloadsQueue.length) {
-          // Available stacked data
-          resolver(this.#eventPayloadsQueue.shift()!);
-        } else {
-          // Nothing stacked. Awaiting next data
-          this.#resolveNext = resolver;
-        }
-      };
-
-      return {
-        /** @inheritdoc */
-        next() {
-          return new Promise<IteratorResult<{ entity: EntityId; components: Iterable<EcsComponent<any>> }>>(
-            (resolve) => {
-              /** @inheritdoc */
-              setResolver((value) => resolve({ value, done: false }));
-            },
-          );
-        },
-      };
-    }
-
-    /** @inheritdoc */
     [Symbol.dispose]() {
-      this.#unsubscribe();
+      this.#unsubscribe?.();
+      this.#unsubscribe = undefined;
+
       super[Symbol.dispose]();
     }
   };

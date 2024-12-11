@@ -1,4 +1,4 @@
-import { EcsWorld } from '@bim/ecs';
+import { EcsWorld } from 'bim-ecs';
 import { eventsHandlingPlugin } from './inputs-binding';
 import { renderingPlugin } from './rendering';
 import { bricksPlugin } from './brick';
@@ -9,10 +9,10 @@ import { scorePlugin } from './score';
 
 const world = new EcsWorld();
 
-world.use(platePlugin);
+world.use(renderingPlugin);
 world.use(bricksPlugin);
 world.use(ballPlugin);
-world.use(renderingPlugin);
+world.use(platePlugin);
 world.use(eventsHandlingPlugin);
 world.use(disablingPlugin);
 world.use(scorePlugin);

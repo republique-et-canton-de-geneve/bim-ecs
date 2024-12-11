@@ -19,44 +19,39 @@ export function componentRemoved<TValue, TComponent extends EcsComponent<TValue>
   query?: QueryDefinition,
 ): SchedulerCtor<{ component: TComponent; entity: EntityId }> {
   return class extends Scheduler<{ component: TComponent; entity: EntityId }> implements Debuggable {
-    #resolveNext: ((value: { component: TComponent; entity: EntityId }) => void) | null = null;
+    /** @inheritdoc */
+    public run(next: (payload: { component: TComponent; entity: EntityId }) => void) {
+      this.#unsubscribe = this.world.bus.subscribe(ECS_COMPONENT_LINK_REMOVED, (args) => {
+        // Filtering
+        if (
+          // Component type check
+          args.component.constructor !== componentType ||
+          // (Optionally) Query check
+          (query &&
+            !runAtomicQueryOnSingleEntity(
+              {
+                entity: args.entity,
+                componentsMask: archetypeMaskFor(
+                  this.world.entities.componentsOf(args.entity).keys(),
+                  this.world.query.archetypeCache.counter,
+                ),
+              },
+              compileQueryDefinition(query),
+              {
+                counter: this.world.query.archetypeCache.counter,
+                indexesRepository: this.world.query.indexedComponentsCache.entitiesByComponentValues,
+              },
+            ))
+        ) {
+          return; // Not candidate
+        }
 
-    /** Pending event payloads */
-    readonly #eventPayloadsQueue: { component: TComponent; entity: EntityId }[] = [];
+        // Next step processing
+        next(args as { component: TComponent; entity: EntityId });
+      });
+    }
 
-    #unsubscribe: Function = this.world.bus.subscribe(ECS_COMPONENT_LINK_REMOVED, (args) => {
-      if (
-        // Component type check
-        args.component.constructor !== componentType ||
-        // (Optionally) Query check
-        (query &&
-          !runAtomicQueryOnSingleEntity(
-            {
-              entity: args.entity,
-              componentsMask: archetypeMaskFor(
-                this.world.entities.componentsOf(args.entity).keys(),
-                this.world.query.archetypeCache.counter,
-              ),
-            },
-            compileQueryDefinition(query),
-            {
-              counter: this.world.query.archetypeCache.counter,
-              indexesRepository: this.world.query.indexedComponentsCache.entitiesByComponentValues,
-            },
-          ))
-      ) {
-        return; // Not candidate
-      }
-
-      if (this.#resolveNext) {
-        // Executing immediately
-        this.#resolveNext(args as { component: TComponent; entity: EntityId });
-        this.#resolveNext = null;
-      } else {
-        // Stacking data
-        this.#eventPayloadsQueue.push(args as { component: TComponent; entity: EntityId });
-      }
-    });
+    #unsubscribe: Function | undefined = undefined;
 
     get [DEBUG_NAME]() {
       return componentType.name ?? '#no name';
@@ -70,31 +65,10 @@ export function componentRemoved<TValue, TComponent extends EcsComponent<TValue>
     }
 
     /** @inheritdoc */
-    getIteratorImplementation() {
-      const setResolver = (resolver: (value: { component: TComponent; entity: EntityId }) => void) => {
-        if (this.#eventPayloadsQueue.length) {
-          // Available stacked data
-          resolver(this.#eventPayloadsQueue.shift()!);
-        } else {
-          // Nothing stacked. Awaiting next data
-          this.#resolveNext = resolver;
-        }
-      };
-
-      return {
-        /** @inheritdoc */
-        next() {
-          return new Promise<IteratorResult<{ component: TComponent; entity: EntityId }>>((resolve) => {
-            /** @inheritdoc */
-            setResolver((value) => resolve({ value, done: false }));
-          });
-        },
-      };
-    }
-
-    /** @inheritdoc */
     [Symbol.dispose]() {
-      this.#unsubscribe();
+      this.#unsubscribe?.();
+      this.#unsubscribe = undefined;
+
       super[Symbol.dispose]();
     }
   };

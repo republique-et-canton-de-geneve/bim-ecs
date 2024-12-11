@@ -1,4 +1,4 @@
-import { map } from '@bim/iterable';
+import { map } from '@bim-ecs/iterable';
 import { EcsComponent } from '../../components';
 
 export type Archetype = Iterable<typeof EcsComponent<any>>;

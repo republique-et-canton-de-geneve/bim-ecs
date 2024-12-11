@@ -87,4 +87,52 @@ describe('after', () => {
 
     expect(payloadValue).toBe('bar');
   });
+
+  it('should process after even if predecessor has been disposed', async () => {
+    const world = new EcsWorld();
+
+    const systemDefinition1 = defineSystem(
+      'foo1',
+      () => new Promise((resolve) => setTimeout(() => resolve('bar'), 10)),
+      startup,
+    );
+
+    let payloadValue: any = undefined;
+    const systemDefinition2 = defineSystem(
+      'foo2',
+      (_, { payload }) => (payloadValue = payload),
+      after(systemDefinition1),
+    );
+
+    world.registerSystem(systemDefinition1);
+    world.registerSystem(systemDefinition2);
+    world.run();
+
+    await new Promise((resolve) => setTimeout(resolve, 15));
+
+    expect(payloadValue).toBe('bar');
+  });
+
+  it('should process after with multiple systems even if predecessor has been disposed', async () => {
+    const world = new EcsWorld();
+
+    const systemDefinition1 = defineSystem(
+      'foo1',
+      () => new Promise((resolve) => setTimeout(() => resolve('bar'), 10)),
+      startup,
+    );
+
+    let counter = 0;
+    const systemDefinition2 = defineSystem('foo2', (_) => counter++, after(systemDefinition1));
+    const systemDefinition3 = defineSystem('foo3', (_) => counter++, after(systemDefinition1));
+
+    world.registerSystem(systemDefinition1);
+    world.registerSystem(systemDefinition2);
+    world.registerSystem(systemDefinition3);
+    world.run();
+
+    await new Promise((resolve) => setTimeout(resolve, 15));
+
+    expect(counter).toBe(2);
+  });
 });

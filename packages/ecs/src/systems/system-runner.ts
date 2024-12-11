@@ -4,6 +4,7 @@ import type { EcsWorld } from '../world';
 import { SCHEDULER_DISPOSED_EVENT } from '../scheduling/scheduler-events';
 import {
   ECS_SYSTEM_DISPOSED_EVENT,
+  ECS_SYSTEM_PROCESS_ENDED_EVENT,
   ECS_SYSTEM_PROCESSED_EVENT,
   ECS_SYSTEM_PROCESSING_EVENT,
   ECS_SYSTEM_PROCESSING_FAILED_EVENT,
@@ -19,6 +20,9 @@ export class SystemRunner<TPayload, TReturnType = any> implements Disposable, De
   #running = false;
   #disposed = false;
   #schedulerDisposed = false;
+
+  /** The correlation ids of the running processes */
+  #runningProcessCorrelationIds = new Set<number>();
 
   readonly #scheduler: Scheduler<TPayload>;
   // #iterator: any; //AsyncIterator<TPayload>
@@ -134,12 +138,56 @@ export class SystemRunner<TPayload, TReturnType = any> implements Disposable, De
     if (this.#running) return;
     this.#running = true;
 
+    let correlationIdCounter = 0;
+
+    /**
+     * Handles next iteration step invocation
+     * @param payload The payload for this step
+     */
     const nextHandler = (payload: any) => {
       if (this.disposed) return;
 
-      // Beginning event
-      this.publishStateEvent(ECS_SYSTEM_PROCESSING_EVENT);
+      /** The correlation id of the current process session step */
+      const correlationId = correlationIdCounter++;
 
+      // Declaring process step session as running
+      this.#runningProcessCorrelationIds.add(correlationId);
+
+      /**
+       * Handles process failure
+       * @param error The error
+       */
+      const failureHandler = (error: any) => {
+        // Error event
+        this.publishStateEvent(ECS_SYSTEM_PROCESSING_FAILED_EVENT, { correlationId, error } satisfies Pick<
+          ExtractEcsEventType<typeof ECS_SYSTEM_PROCESSING_FAILED_EVENT>,
+          'error' | 'correlationId'
+        >);
+        console.error(`[ECS] An error occurred while running system ${this.ecs.system.name}`, error);
+      };
+
+      /**
+       * Handles process ending
+       */
+      const finalizationHandler = () => {
+        // Declaring process step session as ended
+        this.#runningProcessCorrelationIds.delete(correlationId);
+
+        // End event
+        this.publishStateEvent(ECS_SYSTEM_PROCESS_ENDED_EVENT, { correlationId } satisfies Pick<
+          ExtractEcsEventType<typeof ECS_SYSTEM_PROCESS_ENDED_EVENT>,
+          'correlationId'
+        >);
+      };
+
+      // Beginning event
+      this.publishStateEvent(ECS_SYSTEM_PROCESSING_EVENT, { correlationId } satisfies Pick<
+        ExtractEcsEventType<typeof ECS_SYSTEM_PROCESSING_EVENT>,
+        'correlationId'
+      >);
+
+      /** Determines whether the process is async */
+      let isAsync = false;
       try {
         // System processing
         const result = this.ecs.system(this.ecs.world, {
@@ -150,8 +198,9 @@ export class SystemRunner<TPayload, TReturnType = any> implements Disposable, De
         const processAfterward = (result: any) => {
           // End event
           this.publishStateEvent(ECS_SYSTEM_PROCESSED_EVENT, {
+            correlationId,
             returnValue: result,
-          } satisfies Pick<ExtractEcsEventType<typeof ECS_SYSTEM_PROCESSED_EVENT>, 'returnValue'>);
+          } satisfies Pick<ExtractEcsEventType<typeof ECS_SYSTEM_PROCESSED_EVENT>, 'returnValue' | 'correlationId'>);
 
           // Post execution event processing
           if (this.options?.then?.publish) {
@@ -165,32 +214,37 @@ export class SystemRunner<TPayload, TReturnType = any> implements Disposable, De
         };
 
         if (typeof (result as Promise<unknown>)?.then === 'function') {
-          // Promise case
-          (result as Promise<any>).then(processAfterward);
+          // Promise case -> async path
+          (result as Promise<any>).then(processAfterward).catch(failureHandler).finally(finalizationHandler);
         } else {
           // Synchronous case
-          processAfterward(result);
+          isAsync = true;
+          processAfterward(result); // -> sync path step1
         }
 
         return result;
       } catch (error) {
-        // Error event
-        this.publishStateEvent(ECS_SYSTEM_PROCESSING_FAILED_EVENT, { error } satisfies Pick<
-          ExtractEcsEventType<typeof ECS_SYSTEM_PROCESSING_FAILED_EVENT>,
-          'error'
-        >);
-        console.error(`[ECS] An error occurred while running system ${this.ecs.system.name}`, error);
+        failureHandler(error);
       } finally {
+        if (!isAsync) finalizationHandler(); // -> sync path step2
         if (this.#schedulerDisposed) this[Symbol.dispose]();
       }
     };
 
-    const disposeHandler = () => {
-      this[Symbol.dispose]();
-    };
+    /** Handles disposal request from scheduler */
+    const disposeHandler = () => queueMicrotask(() => this[Symbol.dispose]());
 
     this.#scheduler.run(nextHandler, disposeHandler);
   }
+
+  /**
+   * Determines whether the process correlation id is currently running
+   * @param correlationId The correlation id of the process step iteration
+   */
+  public isRunning(correlationId: number) {
+    return this.#runningProcessCorrelationIds.has(correlationId);
+  }
+
   /** Publishes a system event to current world event bus */
   private publishStateEvent(key: EcsEvent<{ id: number; time: number }>, additionalData?: any) {
     const time = Date.now();

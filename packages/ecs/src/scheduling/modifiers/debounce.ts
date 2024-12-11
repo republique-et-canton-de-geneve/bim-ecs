@@ -12,9 +12,10 @@ let i = 0;
 export function debounce<T>(schedulersConstructor: SchedulerCtor<T>, delay: number): SchedulerCtor<T> {
   return class extends Scheduler<T> {
     #_internalId = i++;
+    #debounceTimer: NodeJS.Timeout | null = null;
+    #lastPayload: T | undefined = undefined;
 
     readonly #scheduler: Scheduler<T> = new schedulersConstructor(this.world, this);
-    #resolveFn: Function | null = null;
 
     get [DEBUG_NAME]() {
       return `debounce ${delay}ms`;
@@ -27,60 +28,52 @@ export function debounce<T>(schedulersConstructor: SchedulerCtor<T>, delay: numb
       return [this.#scheduler];
     }
 
-    public run(next: (payload: T) => void, dispose: () => void): void {
-      throw new Error('Method not implemented.');
-    }
-
     /** @inheritdoc */
-    // async *getIteratorImplementation() {
-    //   let rejectFn: Function | null = null;
-    //   let done = false;
-    //
-    //   /** Creates a new deferral value */
-    //   const createDeferral = () =>
-    //     new Promise<T>((resolve, reject) => {
-    //       this.#resolveFn = resolve;
-    //       rejectFn = reject;
-    //     });
-    //
-    //   /** Deferred iteration item */
-    //   let deferredResult = createDeferral();
-    //
-    //   /** TimeoutId to be reset if an iteration occurres before specified delay */
-    //   let timeoutId: ReturnType<typeof setTimeout> | undefined = undefined;
-    //
-    //   /** Loops onto every entry stream items */
-    //   const loop = async () => {
-    //     for await (const item of this.#scheduler) {
-    //       // Disposal management
-    //       if (this.disposed) return;
-    //
-    //       // Debounced resolution
-    //       clearTimeout(timeoutId);
-    //       timeoutId = setTimeout(() => this.#resolveFn!(item), delay);
-    //     }
-    //   };
-    //
-    //   // Background looping task
-    //   loop()
-    //     .catch(rejectFn)
-    //     .then(() => (done = true));
-    //
-    //   // Streamed data iteration
-    //   while (!done && !this.disposed) {
-    //     const result = await deferredResult;
-    //     if (!this.disposed) yield result;
-    //     deferredResult = createDeferral();
-    //   }
-    // }
+    public run(next: (payload: T) => void, dispose: () => void): void {
+      let markedAsDisposed = false;
+
+      const tryDispose = () => {
+        if (markedAsDisposed && !this.#debounceTimer) {
+          dispose();
+        }
+      };
+
+      const handleChildDispose = () => {
+        markedAsDisposed = true;
+        tryDispose();
+      };
+
+      const handleChildNext = (payload: T) => {
+        if (this.disposed) return;
+
+        this.#lastPayload = payload;
+
+        if (this.#debounceTimer) {
+          clearTimeout(this.#debounceTimer);
+        }
+
+        this.#debounceTimer = setTimeout(() => {
+          if (this.#debounceTimer !== null) {
+            next(this.#lastPayload as T);
+            this.#debounceTimer = null;
+            tryDispose();
+          }
+        }, delay);
+      };
+
+      this.#scheduler.run(handleChildNext, handleChildDispose);
+    }
 
     /** @inheritdoc */
     [Symbol.dispose]() {
       // Updates the dispose state
       super[Symbol.dispose]();
 
-      // Unlock the last deferred element (won't pop because of the disposed state) to terminate process without leak
-      this.#resolveFn?.();
+      // Unlock the last deferred element (if any) to terminate process without leak
+      if (this.#debounceTimer !== null) {
+        clearTimeout(this.#debounceTimer);
+        this.#debounceTimer = null;
+      }
     }
   };
 }

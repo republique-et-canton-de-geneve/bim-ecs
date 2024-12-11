@@ -10,13 +10,12 @@ let i = 0;
  * @param schedulersConstructors Scheduler to aggregate
  */
 export function compose(...schedulersConstructors: ReadonlyArray<SchedulerCtor<any>>) {
-  const DONE = Symbol('done');
-
   return class extends Scheduler<any> implements Debuggable {
     #_internalId = i++;
 
     /** scheduler instances */
-    #schedulers: Scheduler<any>[] = schedulersConstructors.map((ctor) => new ctor(this.world, this));
+    #schedulers = schedulersConstructors.map((ctor) => new ctor(this.world, this));
+    #disposedSchedulers = new Set<Scheduler<any>>();
 
     get [DEBUG_NAME]() {
       return `compose`;
@@ -34,38 +33,21 @@ export function compose(...schedulersConstructors: ReadonlyArray<SchedulerCtor<a
     }
 
     public run(next: (payload: any) => void, dispose: () => void): void {
-      throw new Error('Method not implemented.');
-    }
+      const handleChildNext = (payload: any) => {
+        if (this.disposed) return;
 
-    // /** @inheritdoc */
-    // async *getIteratorImplementation() {
-    //   /** scheduler iterator instances */
-    //   const iterators = this.#schedulers.map((scheduler) => scheduler.getIteratorImplementation());
-    //
-    //   // Function to get the next value from an iterator
-    //   async function getNext(iterator: AsyncIterator<any>): Promise<any | null> {
-    //     const result = await iterator.next();
-    //     return result.done ? DONE : result.value;
-    //   }
-    //
-    //   // Create initial tasks for the first value of each iterator
-    //   const tasks = iterators.map((it) => getNext(it));
-    //
-    //   while (tasks.length > 0) {
-    //     // Wait for the first completed task
-    //     const [result, index] = await Promise.race(tasks.map((p, i) => p.then((value) => [value, i] as [any, number])));
-    //
-    //     if (result !== DONE) {
-    //       // Schedule the next value from the completed iterator
-    //       tasks[index] = getNext(iterators[index]);
-    //       yield result;
-    //     } else {
-    //       // Remove completed iterator
-    //       tasks.splice(index, 1);
-    //       iterators.splice(index, 1);
-    //     }
-    //   }
-    // }
+        next(payload);
+      };
+
+      for (const scheduler of this.#schedulers) {
+        const handleChildDispose = () => {
+          this.#disposedSchedulers.add(scheduler);
+          if (this.#disposedSchedulers.size === this.#schedulers.length) dispose();
+        };
+
+        scheduler.run(handleChildNext, handleChildDispose);
+      }
+    }
 
     /** @inheritdoc */
     [Symbol.dispose]() {

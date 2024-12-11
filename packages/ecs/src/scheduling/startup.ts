@@ -26,7 +26,7 @@ export class startup extends Scheduler<number> implements Debuggable {
         await result;
       }
 
-      queueMicrotask(() => dispose());
+      dispose();
     });
   }
 

@@ -70,8 +70,7 @@
     "vite-plugin-dts": "^4.3.0",
     "jsdom": "^24.1.0",
     "glob": "11.0.0",
-    "playwright": "^1.49.1",
-    "vite-plugin-static-copy": "2.2.0"
+    "playwright": "^1.49.1"
   },
   "dependencies": {
     "@bim-ecs/iterable": "^0.0.0",

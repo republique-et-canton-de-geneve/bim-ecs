@@ -147,16 +147,6 @@ export class EcsWorld implements Disposable {
         this.bus.subscribe(ECS_WORLD_DISPOSING_EVENT, () =>
           console.log(`%c[ECS] %c❌ ECS world disposing`, 'color: yellow;', 'color: white; font-weight: bold;'),
         );
-
-        this.bus.subscribe(ECS_ENTITY_SPAWNED, ({ entity, components }) =>
-          console.log(
-            `%c[ECS] %c🚀 ECS entity spawned`,
-            entity,
-            components,
-            'color: yellow;',
-            'color: white; font-weight: bold;',
-          ),
-        );
         break;
     }
   }

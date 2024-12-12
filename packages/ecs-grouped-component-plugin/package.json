@@ -13,6 +13,8 @@
   "version": "0.0.0",
   "type": "module",
   "license": "Apache-2.0",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.es.js",
   "exports": {
     ".": {
       "require": "./dist/index.cjs.js",
@@ -34,9 +36,7 @@
     "vitest": "^2.1.4",
     "vite-plugin-dts": "^4.3.0",
     "jsdom": "^24.1.0",
-    "glob": "11.0.0",
-    "playwright": "^1.49.1",
-    "vite-plugin-static-copy": "2.2.0"
+    "playwright": "^1.49.1"
   },
   "peerDependencies": {
     "bim-ecs": "^0.0.0"

@@ -39,12 +39,12 @@ export const updateBallSystem = defineSystem(
   ({ entities, container, bus }) => {
     const config = container.resolve(Config);
 
-    for (const ball of entities.queryEntities(() => [Ball, BoxGeometry, Velocity])) {
+    for (const ball of entities.query(() => [Ball, BoxGeometry, Velocity])) {
       const ballComponents = entities.componentsOf(ball);
       const boxGeometry = ballComponents.get(BoxGeometry)! as BoxGeometry;
       const velocity = ballComponents.get(Velocity)! as Velocity;
 
-      const obstacles = entities.queryEntities(({ without }) => [BoxGeometry, without(Ball), without(Disabled)]);
+      const obstacles = entities.query(({ without }) => [BoxGeometry, without(Ball), without(Disabled)]);
 
       for (const obstacle of obstacles) {
         const components = entities.componentsOf(obstacle);

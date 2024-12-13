@@ -8,6 +8,7 @@ export default mergeConfig(
     test: {
       environment: 'jsdom',
       exclude: [...configDefaults.exclude, 'e2e/*'],
+      // @ts-ignore
       root: fileURLToPath(new URL('./', import.meta.url)),
       browser: {
         provider: 'playwright', // or 'webdriverio'

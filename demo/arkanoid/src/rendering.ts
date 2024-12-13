@@ -45,11 +45,11 @@ export const initializeSceneSystem = defineSystem(
 export const initializeBoxGeometriesRenderingSystem = defineSystem(
   'Init Box geometries rendering',
   ({ entities }) => {
-    const scene = entities.queryEntities(() => [SceneComponent]).next().value!;
+    const scene = entities.query(() => [SceneComponent]).next().value!;
     const sceneElement = entities.componentsOf(scene).get(DOMElementComponent)!.value;
 
     // const entity = payload.entity; // option A
-    const entitiesToInitialize = entities.queryEntities(({ without }) => [BoxGeometry, without(DOMElementComponent)]); // option B
+    const entitiesToInitialize = entities.query(({ without }) => [BoxGeometry, without(DOMElementComponent)]); // option B
 
     for (const entity of entitiesToInitialize) /* option B */ {
       const components = entities.componentsOf(entity);
@@ -87,7 +87,7 @@ export const handleEntityDeletionSystem = defineSystem(
 export const updatePlateRenderingSystem = defineSystem(
   'Render plate',
   ({ entities }) => {
-    const plate = entities.queryEntity(() => [Plate, BoxGeometry, DOMElementComponent]);
+    const plate = entities.queryOne(() => [Plate, BoxGeometry, DOMElementComponent]);
     if (plate !== undefined) {
       const components = entities.componentsOf(plate);
       const boxGeometry = components.get(BoxGeometry)!.value;
@@ -102,7 +102,7 @@ export const updatePlateRenderingSystem = defineSystem(
 export const updateBallRenderingSystem = defineSystem(
   'Render ball',
   ({ entities }) => {
-    for (const ball of entities.queryEntities(() => [Ball, BoxGeometry, DOMElementComponent])) {
+    for (const ball of entities.query(() => [Ball, BoxGeometry, DOMElementComponent])) {
       const components = entities.componentsOf(ball);
       const boxGeometry = components.get(BoxGeometry)!.value;
       const ballElement = components.get(DOMElementComponent)!.value;
@@ -117,7 +117,7 @@ export const updateBallRenderingSystem = defineSystem(
 export const updateScoreRenderingSystem = defineSystem(
   'Rendering score',
   ({ entities, container }) => {
-    const scene = entities.queryEntity(() => [SceneComponent, DOMElementComponent]);
+    const scene = entities.queryOne(() => [SceneComponent, DOMElementComponent]);
     if (scene !== undefined) {
       const scoreResources = container.resolve(ScoreResource);
       const scoreText = `Score: ${scoreResources.value}`;

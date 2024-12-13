@@ -32,14 +32,14 @@ export class EntitiesFacade implements Partial<EntityPool> {
 
   /** @inheritDoc */
   public removeComponent(entity: EntityId, ...types: (typeof EcsComponent<any>)[]) {
-    return this.pool.removeComponent(entity);
+    return this.pool.removeComponent(entity, ...types);
   }
 
   /**
    * Query entities from specified query definition
    * @param queryDefinition Query definition data
    */
-  public queryEntities(queryDefinition: QueryDefinition) {
+  public query(queryDefinition: QueryDefinition) {
     return this.querying.execute(queryDefinition);
   }
 
@@ -47,7 +47,7 @@ export class EntitiesFacade implements Partial<EntityPool> {
    * Query first entity from specified query definition
    * @param queryDefinition Query definition data
    */
-  public queryEntity(queryDefinition: QueryDefinition) {
+  public queryOne(queryDefinition: QueryDefinition) {
     return this.querying.executeOne(queryDefinition);
   }
 }

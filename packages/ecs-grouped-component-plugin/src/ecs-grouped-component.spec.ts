@@ -21,13 +21,13 @@ describe('ecs-grouped-component', () => {
     world.run();
 
     const entity = world.entities.spawn(new BarComponent());
-    expect(Array.from(world.query.execute(() => [GroupFoo]))).toHaveLength(0);
+    expect(Array.from(world.entities.query(() => [GroupFoo]))).toHaveLength(0);
 
     world.entities.addComponent(entity, new GroupedFoo());
-    expect(Array.from(world.query.execute(() => [GroupFoo]))).toHaveLength(1);
+    expect(Array.from(world.entities.query(() => [GroupFoo]))).toHaveLength(1);
 
     world.entities.removeComponent(entity, GroupedFoo);
-    expect(Array.from(world.query.execute(() => [GroupFoo]))).toHaveLength(0);
+    expect(Array.from(world.entities.query(() => [GroupFoo]))).toHaveLength(0);
   });
 
   it('should have added a group component when entity have been spawned with grouped component', () => {
@@ -42,9 +42,9 @@ describe('ecs-grouped-component', () => {
     world.run();
 
     const entity = world.entities.spawn(new GroupedFoo());
-    expect(Array.from(world.query.execute(() => [GroupFoo]))).toHaveLength(1);
+    expect(Array.from(world.entities.query(() => [GroupFoo]))).toHaveLength(1);
 
     world.entities.removeComponent(entity, GroupedFoo);
-    expect(Array.from(world.query.execute(() => [GroupFoo]))).toHaveLength(0);
+    expect(Array.from(world.entities.query(() => [GroupFoo]))).toHaveLength(0);
   });
 });

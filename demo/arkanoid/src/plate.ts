@@ -44,7 +44,7 @@ export const initializePlateSystem = defineSystem(
 export const updatePlateSystem = defineSystem(
   'Update plate',
   ({ entities, container }, { payload }) => {
-    const plate = entities.queryEntities(() => [Plate, BoxGeometry]).next().value;
+    const plate = entities.query(() => [Plate, BoxGeometry]).next().value;
     if (plate !== undefined) {
       const config = container.resolve(Config);
       const components = entities.componentsOf(plate);

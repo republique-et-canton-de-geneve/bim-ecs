@@ -15,11 +15,11 @@ import {
 } from '../systems/system-events';
 import { ECS_WORLD_DISPOSING_EVENT, ECS_WORLD_RUNNING_EVENT, ECS_WORLD_STOPPING_EVENT } from './world-events';
 import { EcsResource } from '../resources';
-import { EntityPool } from '../entities/entity-pool';
-import { ECS_ENTITY_SPAWNED } from '../entities/entities-events';
+import { EntityPool } from '../entities';
 import type { EcsPlugin } from './ecs-plugin';
 import { DebugTracker } from '../debug/debug-tracker';
-import { QueryEngine } from '../querying/query-engine';
+import { QueryEngine } from '../querying';
+import { EntitiesFacade } from '../entities/entities-facade';
 
 /** ECS world handling the overall ECS life cycle */
 export class EcsWorld implements Disposable {
@@ -29,14 +29,19 @@ export class EcsWorld implements Disposable {
 
   /** Events bus */
   public readonly bus = new EventBus();
+
   /** Dependency injection handler */
   public readonly container = new ResourceContainer(this);
+
   /** System pool */
   public readonly systems = new EcsSystemsPool(this);
-  /** Entities pool */
-  public readonly entities = new EntityPool(this);
-  /** Query engine */
-  public readonly query = new QueryEngine(this);
+
+  private readonly entityPool = new EntityPool(this);
+  private readonly queryEngine = new QueryEngine(this, this.entityPool);
+
+  /** Entities facade */
+  public readonly entities = new EntitiesFacade(this.entityPool, this.queryEngine);
+
   /** Debug tracker */
   public readonly debug = new DebugTracker(this);
 
@@ -90,8 +95,8 @@ export class EcsWorld implements Disposable {
     this.systems[Symbol.dispose]();
     this.bus[Symbol.dispose]();
     this.container[Symbol.dispose]();
-    this.query[Symbol.dispose]();
-    this.entities[Symbol.dispose]();
+    this.queryEngine[Symbol.dispose]();
+    this.entityPool[Symbol.dispose]();
   }
 
   private verbose(type: 'info' | 'debug' | true) {

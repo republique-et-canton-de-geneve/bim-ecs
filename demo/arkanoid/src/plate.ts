@@ -5,8 +5,8 @@ import { EcsComponent } from 'bim-ecs/components';
 import { BoxGeometry } from './box-geometry';
 import { pointerMoveEvent } from './inputs';
 import { Name } from './common';
-import { EcsEvent } from '@bim-ecs/event-bus';
-import { EntityId } from '@bim-ecs/entities';
+import { EcsEvent } from 'bim-ecs/event-bus';
+import { EntityId } from 'bim-ecs/entities';
 import { BallCollisionTrigger } from './ball-collision-trigger';
 import { Velocity } from './velocity';
 
@@ -43,8 +43,8 @@ export const initializePlateSystem = defineSystem(
 
 export const updatePlateSystem = defineSystem(
   'Update plate',
-  ({ query, entities, container }, { payload }) => {
-    const plate = query.execute(() => [Plate, BoxGeometry]).next().value;
+  ({ entities, container }, { payload }) => {
+    const plate = entities.queryEntities(() => [Plate, BoxGeometry]).next().value;
     if (plate !== undefined) {
       const config = container.resolve(Config);
       const components = entities.componentsOf(plate);

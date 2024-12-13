@@ -1,11 +1,11 @@
 import { ArchetypeMaskMap } from './archetype-mask-map';
-import type { EntityId } from '../../entities';
+import { type EntityId, EntityPool } from '../../entities';
 import { archetypeFromComponents, type ArchetypeMask } from './archetype';
 import { archetypeMaskFor } from './archetype-mask-for';
 import { ComponentTypeIdFlagCounter } from '../component-type-id-flag-counter';
 import { EcsWorld } from '../../world';
-import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from '../../entities/entities-events';
-import { ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED } from '../../components/ecs-component-events';
+import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from '../../entities';
+import { ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED } from '../../components';
 
 export class ArchetypeCache implements Disposable {
   #disposals = [] as Function[];
@@ -15,7 +15,10 @@ export class ArchetypeCache implements Disposable {
   public readonly entitiesByArchetypeMask = new ArchetypeMaskMap<Set<EntityId>>();
   public readonly archetypeMaskByEntity = new Map<EntityId, ArchetypeMask>();
 
-  constructor(private readonly world: Pick<EcsWorld, 'entities' | 'bus'>) {
+  constructor(
+    world: Pick<EcsWorld, 'bus'>,
+    private readonly entityPool: EntityPool,
+  ) {
     this.#disposals.push(world.bus.subscribe(ECS_ENTITY_SPAWNED, ({ entity }) => this.handleAddedEntity(entity)));
     this.#disposals.push(world.bus.subscribe(ECS_ENTITY_REMOVED, ({ entity }) => this.handleRemovedEntity(entity)));
     this.#disposals.push(
@@ -26,7 +29,7 @@ export class ArchetypeCache implements Disposable {
   }
 
   private handleAddedEntity(entityId: EntityId) {
-    const archetype = archetypeFromComponents(this.world.entities.componentsByEntity.get(entityId) ?? []);
+    const archetype = archetypeFromComponents(this.entityPool.componentsByEntity.get(entityId) ?? []);
     const mask = archetypeMaskFor(archetype, this.counter);
 
     // entitiesByArchetypeMask registration

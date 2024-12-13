@@ -27,10 +27,11 @@ describe('Scheduler', () => {
 
     it('should stop iterating after being disposed', async () => {
       class Scheduler1 extends Scheduler<number> {
-        run(next: (value: number) => void, dispose: () => void) {
+        async run(next: (value: number) => void, dispose: () => void) {
           next(1);
           next(2);
           dispose();
+          await Promise.resolve();
           next(3);
         }
       }
@@ -41,6 +42,7 @@ describe('Scheduler', () => {
 
       world.systems.registerSystem(system);
       world.run();
+      await new Promise((resolve) => setTimeout(resolve));
 
       expect(results).toEqual([1, 2]);
     });

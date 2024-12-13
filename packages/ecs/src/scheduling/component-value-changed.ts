@@ -57,13 +57,13 @@ export function componentValueChanged<TValue, TComponent extends EcsMutableCompo
                     entity,
                     componentsMask: archetypeMaskFor(
                       this.world.entities.componentsOf(entity).keys(),
-                      this.world.query.archetypeCache.counter,
+                      this.world.entities.querying.archetypeCache.counter,
                     ),
                   },
                   compileQueryDefinition(query),
                   {
-                    counter: this.world.query.archetypeCache.counter,
-                    indexesRepository: this.world.query.indexedComponentsCache.entitiesByComponentValues,
+                    counter: this.world.entities.querying.archetypeCache.counter,
+                    indexesRepository: this.world.entities.querying.indexedComponentsCache.entitiesByComponentValues,
                   },
                 ),
             ))

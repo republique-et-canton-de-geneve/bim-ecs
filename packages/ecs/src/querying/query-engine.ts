@@ -5,7 +5,7 @@ import type { QueryDefinition } from './query-definition';
 import { runQueryChunkOnArchetypeMask } from './query-processing';
 import { compileQueryDefinition } from './compile-query';
 import { IndexedComponentsCache } from './_indexed-components/indexed-components-cache';
-import type { EntityId } from '../entities';
+import { type EntityId, EntityPool } from '../entities';
 
 /**
  * Handles ECS querying
@@ -15,8 +15,11 @@ export class QueryEngine implements Disposable {
   public readonly archetypeCache: ArchetypeCache;
   public readonly indexedComponentsCache: IndexedComponentsCache;
 
-  constructor(private readonly world: Pick<EcsWorld, 'bus' | 'entities'>) {
-    this.archetypeCache = new ArchetypeCache(this.world);
+  constructor(
+    private readonly world: Pick<EcsWorld, 'bus'>,
+    entityPool: EntityPool,
+  ) {
+    this.archetypeCache = new ArchetypeCache(this.world, entityPool);
     this.indexedComponentsCache = new IndexedComponentsCache(this.world);
   }
 

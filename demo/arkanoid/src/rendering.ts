@@ -44,12 +44,12 @@ export const initializeSceneSystem = defineSystem(
 
 export const initializeBoxGeometriesRenderingSystem = defineSystem(
   'Init Box geometries rendering',
-  ({ query, entities }, { payload }) => {
-    const scene = query.execute(() => [SceneComponent]).next().value!;
+  ({ entities }) => {
+    const scene = entities.queryEntities(() => [SceneComponent]).next().value!;
     const sceneElement = entities.componentsOf(scene).get(DOMElementComponent)!.value;
 
     // const entity = payload.entity; // option A
-    const entitiesToInitialize = query.execute(({ without }) => [BoxGeometry, without(DOMElementComponent)]); // option B
+    const entitiesToInitialize = entities.queryEntities(({ without }) => [BoxGeometry, without(DOMElementComponent)]); // option B
 
     for (const entity of entitiesToInitialize) /* option B */ {
       const components = entities.componentsOf(entity);
@@ -86,8 +86,8 @@ export const handleEntityDeletionSystem = defineSystem(
 
 export const updatePlateRenderingSystem = defineSystem(
   'Render plate',
-  ({ query, entities }) => {
-    const plate = query.execute(() => [Plate, BoxGeometry, DOMElementComponent]).next().value;
+  ({ entities }) => {
+    const plate = entities.queryEntity(() => [Plate, BoxGeometry, DOMElementComponent]);
     if (plate !== undefined) {
       const components = entities.componentsOf(plate);
       const boxGeometry = components.get(BoxGeometry)!.value;
@@ -101,8 +101,8 @@ export const updatePlateRenderingSystem = defineSystem(
 
 export const updateBallRenderingSystem = defineSystem(
   'Render ball',
-  ({ query, entities }) => {
-    for (const ball of query.execute(() => [Ball, BoxGeometry, DOMElementComponent])) {
+  ({ entities }) => {
+    for (const ball of entities.queryEntities(() => [Ball, BoxGeometry, DOMElementComponent])) {
       const components = entities.componentsOf(ball);
       const boxGeometry = components.get(BoxGeometry)!.value;
       const ballElement = components.get(DOMElementComponent)!.value;
@@ -116,8 +116,8 @@ export const updateBallRenderingSystem = defineSystem(
 
 export const updateScoreRenderingSystem = defineSystem(
   'Rendering score',
-  ({ query, entities, container }) => {
-    const scene = query.execute(() => [SceneComponent, DOMElementComponent]).next().value;
+  ({ entities, container }) => {
+    const scene = entities.queryEntity(() => [SceneComponent, DOMElementComponent]);
     if (scene !== undefined) {
       const scoreResources = container.resolve(ScoreResource);
       const scoreText = `Score: ${scoreResources.value}`;

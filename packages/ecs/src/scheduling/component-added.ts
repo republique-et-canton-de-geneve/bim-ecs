@@ -2,7 +2,7 @@ import type { SchedulerCtor } from './scheduler-constructor';
 import { Scheduler } from './scheduler';
 import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../debug';
 import { EcsComponent, type EcsComponentCtor } from '../components';
-import { ECS_COMPONENT_LINK_ADDED } from '../components/ecs-component-events';
+import { ECS_COMPONENT_LINK_ADDED } from '../components';
 import type { EntityId } from '../entities';
 import type { QueryDefinition } from '../querying/query-definition';
 import { runAtomicQueryOnSingleEntity } from '../querying/query-processing';
@@ -33,13 +33,13 @@ export function componentAdded<TValue, TComponent extends EcsComponent<TValue>>(
                 entity: args.entity,
                 componentsMask: archetypeMaskFor(
                   this.world.entities.componentsOf(args.entity).keys(),
-                  this.world.query.archetypeCache.counter,
+                  this.world.entities.querying.archetypeCache.counter,
                 ),
               },
               compileQueryDefinition(query),
               {
-                counter: this.world.query.archetypeCache.counter,
-                indexesRepository: this.world.query.indexedComponentsCache.entitiesByComponentValues,
+                counter: this.world.entities.querying.archetypeCache.counter,
+                indexesRepository: this.world.entities.querying.indexedComponentsCache.entitiesByComponentValues,
               },
             ))
         ) {

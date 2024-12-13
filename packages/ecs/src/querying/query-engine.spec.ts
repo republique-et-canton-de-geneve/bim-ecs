@@ -2,7 +2,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { QueryEngine } from './query-engine';
-import { EntityPool } from '../entities/entity-pool';
+import { EntityPool } from '../entities';
 import { EventBus } from '../event-bus';
 import { EcsComponent, EcsIndexedComponent } from '../components';
 
@@ -11,7 +11,7 @@ describe('QueryEngine', () => {
     it('should provide entities with matching components', () => {
       const bus = new EventBus();
       const entities = new EntityPool({ bus });
-      const query = new QueryEngine({ bus, entities });
+      const query = new QueryEngine({ bus }, entities);
 
       class Component1 extends EcsComponent {}
       class Component2 extends EcsComponent {}
@@ -36,7 +36,7 @@ describe('QueryEngine', () => {
     it('should provide entities with matching index values', () => {
       const bus = new EventBus();
       const entities = new EntityPool({ bus });
-      const query = new QueryEngine({ bus, entities });
+      const query = new QueryEngine({ bus }, entities);
 
       class Component1 extends EcsComponent {}
       class Component2 extends EcsIndexedComponent<string> {}
@@ -63,7 +63,7 @@ describe('QueryEngine', () => {
     it('should provide entities with matching components using "with"', () => {
       const bus = new EventBus();
       const entities = new EntityPool({ bus });
-      const query = new QueryEngine({ bus, entities });
+      const query = new QueryEngine({ bus }, entities);
 
       class Component1 extends EcsComponent {}
       class Component2 extends EcsComponent {}
@@ -88,7 +88,7 @@ describe('QueryEngine', () => {
     it('should take into account removed entities', () => {
       const bus = new EventBus();
       const entities = new EntityPool({ bus });
-      const query = new QueryEngine({ bus, entities });
+      const query = new QueryEngine({ bus }, entities);
 
       class Component1 extends EcsComponent {}
       class Component2 extends EcsComponent {}
@@ -117,7 +117,7 @@ describe('QueryEngine', () => {
     it('should exclude components specified in without statement', () => {
       const bus = new EventBus();
       const entities = new EntityPool({ bus });
-      const query = new QueryEngine({ bus, entities });
+      const query = new QueryEngine({ bus }, entities);
 
       class Component1 extends EcsComponent {}
       class Component2 extends EcsComponent {}
@@ -143,7 +143,7 @@ describe('QueryEngine', () => {
     it('should work with only excluded items', () => {
       const bus = new EventBus();
       const entities = new EntityPool({ bus });
-      const query = new QueryEngine({ bus, entities });
+      const query = new QueryEngine({ bus }, entities);
 
       class Component1 extends EcsComponent {}
       class Component2 extends EcsComponent {}
@@ -169,7 +169,7 @@ describe('QueryEngine', () => {
     it('should execute archetype only plan', () => {
       const bus = new EventBus();
       const entities = new EntityPool({ bus });
-      const query = new QueryEngine({ bus, entities });
+      const query = new QueryEngine({ bus }, entities);
 
       class Component1 extends EcsComponent {}
       class Component2 extends EcsComponent<string> {}
@@ -196,7 +196,7 @@ describe('QueryEngine', () => {
     it('should select index only plan', () => {
       const bus = new EventBus();
       const entities = new EntityPool({ bus });
-      const query = new QueryEngine({ bus, entities });
+      const query = new QueryEngine({ bus }, entities);
 
       class Component1 extends EcsIndexedComponent<number> {}
       class Component2 extends EcsIndexedComponent<string> {}
@@ -223,7 +223,7 @@ describe('QueryEngine', () => {
     it('should execute query with mixed entities', () => {
       const bus = new EventBus();
       const entities = new EntityPool({ bus });
-      const query = new QueryEngine({ bus, entities });
+      const query = new QueryEngine({ bus }, entities);
 
       class Component1 extends EcsComponent {}
       class Component2 extends EcsIndexedComponent<string> {}
@@ -250,7 +250,7 @@ describe('QueryEngine', () => {
     it('should execute query with lot of archetypes combinations', () => {
       const bus = new EventBus();
       const entities = new EntityPool({ bus });
-      const query = new QueryEngine({ bus, entities });
+      const query = new QueryEngine({ bus }, entities);
 
       class Component1 extends EcsComponent {}
       class Component2 extends EcsIndexedComponent<string> {}
@@ -281,7 +281,7 @@ describe('QueryEngine', () => {
     it('should provide first match only', () => {
       const bus = new EventBus();
       const entities = new EntityPool({ bus });
-      const query = new QueryEngine({ bus, entities });
+      const query = new QueryEngine({ bus }, entities);
 
       class Component1 extends EcsComponent {}
       class Component2 extends EcsIndexedComponent<string> {}

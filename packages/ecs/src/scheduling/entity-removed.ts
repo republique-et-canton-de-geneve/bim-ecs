@@ -20,7 +20,7 @@ export function entityRemoved(
   query: QueryDefinition,
 ): SchedulerCtor<{ entity: EntityId; components: Iterable<EcsComponent<any>> }> {
   return class extends Scheduler<{ entity: EntityId; components: Iterable<EcsComponent<any>> }> implements Debuggable {
-    readonly #queryClr = this.world.query.compile(query);
+    readonly #queryClr = this.world.entities.querying.compile(query);
     readonly #id = idCounter++;
 
     /** @inheritdoc */
@@ -32,12 +32,12 @@ export function entityRemoved(
         const queryMatchesEntity = runAtomicQueryOnSingleEntity(
           {
             entity: args.entity,
-            componentsMask: archetypeMaskFor(archetype, this.world.query.archetypeCache.counter),
+            componentsMask: archetypeMaskFor(archetype, this.world.entities.querying.archetypeCache.counter),
           },
           this.#queryClr,
           {
-            counter: this.world.query.archetypeCache.counter,
-            indexesRepository: this.world.query.indexedComponentsCache.entitiesByComponentValues,
+            counter: this.world.entities.querying.archetypeCache.counter,
+            indexesRepository: this.world.entities.querying.indexedComponentsCache.entitiesByComponentValues,
           },
         );
 

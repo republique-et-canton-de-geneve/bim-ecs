@@ -33,13 +33,13 @@ export function componentRemoved<TValue, TComponent extends EcsComponent<TValue>
                 entity: args.entity,
                 componentsMask: archetypeMaskFor(
                   this.world.entities.componentsOf(args.entity).keys(),
-                  this.world.query.archetypeCache.counter,
+                  this.world.entities.querying.archetypeCache.counter,
                 ),
               },
               compileQueryDefinition(query),
               {
-                counter: this.world.query.archetypeCache.counter,
-                indexesRepository: this.world.query.indexedComponentsCache.entitiesByComponentValues,
+                counter: this.world.entities.querying.archetypeCache.counter,
+                indexesRepository: this.world.entities.querying.indexedComponentsCache.entitiesByComponentValues,
               },
             ))
         ) {

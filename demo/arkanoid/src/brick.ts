@@ -5,8 +5,8 @@ import { EcsComponent } from 'bim-ecs/components';
 import { BoxGeometry } from './box-geometry';
 import { Name } from './common';
 import { BallCollisionTrigger } from './ball-collision-trigger';
-import { EcsEvent } from '@bim-ecs/event-bus';
-import { EntityId } from '@bim-ecs/entities';
+import { EcsEvent } from 'bim-ecs/event-bus';
+import { EntityId } from 'bim-ecs/entities';
 import { Disabled } from './disabling';
 
 export const bricksPlugin: EcsPlugin = (world) => {

@@ -3,27 +3,21 @@ import { Scheduler } from '../scheduler';
 import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE } from '../../debug';
 
 let i = 0;
-
-/**
- * Debounce scheduler items
- * @param schedulersConstructor The scheduler to be transformed
- * @param delay The debounce delay in ms
- */
-export function debounce<T>(schedulersConstructor: SchedulerCtor<T>, delay: number): SchedulerCtor<T> {
+export function debounceFrame<T>(schedulersConstructor: SchedulerCtor<T>): SchedulerCtor<T> {
   return class extends Scheduler<T> {
     #_internalId = i++;
-    #debounceTimer: NodeJS.Timeout | null = null;
+    #frameRequestId: number | null = null;
     #lastPayload: T | undefined = undefined;
     #isDisposed = false;
 
     readonly #scheduler: Scheduler<T> = new schedulersConstructor(this.world, this);
 
     get [DEBUG_NAME]() {
-      return `debounce ${delay}ms`;
+      return `debounceFrame`;
     }
-    readonly [DEBUG_TYPE] = '🎚';
+    readonly [DEBUG_TYPE] = '🎥';
     get [DEBUG_ID]() {
-      return `debounce_${delay}_${this.#_internalId}`;
+      return `debounceFrame_${this.#_internalId}`;
     }
     get [DEBUG_DEPENDENCIES]() {
       return [this.#scheduler];
@@ -34,7 +28,7 @@ export function debounce<T>(schedulersConstructor: SchedulerCtor<T>, delay: numb
       let isChildDisposed = false;
 
       const tryDispose = () => {
-        if (isChildDisposed && !this.#debounceTimer) {
+        if (isChildDisposed && this.#frameRequestId === null) {
           dispose();
         }
       };
@@ -49,17 +43,17 @@ export function debounce<T>(schedulersConstructor: SchedulerCtor<T>, delay: numb
 
         this.#lastPayload = payload;
 
-        if (this.#debounceTimer) {
-          clearTimeout(this.#debounceTimer);
+        if (this.#frameRequestId !== null) {
+          cancelAnimationFrame(this.#frameRequestId);
         }
 
-        this.#debounceTimer = setTimeout(() => {
-          if (this.#debounceTimer !== null) {
+        this.#frameRequestId = requestAnimationFrame(() => {
+          if (this.#frameRequestId !== null) {
             next(this.#lastPayload as T);
-            this.#debounceTimer = null;
+            this.#frameRequestId = null;
             tryDispose();
           }
-        }, delay);
+        });
       };
 
       this.#scheduler.run(handleChildNext, handleChildDispose);
@@ -67,15 +61,14 @@ export function debounce<T>(schedulersConstructor: SchedulerCtor<T>, delay: numb
 
     /** @inheritdoc */
     [Symbol.dispose]() {
-      // Updates the dispose state
       if (this.#isDisposed) return;
       this.#isDisposed = true;
 
       super[Symbol.dispose]();
 
-      if (this.#debounceTimer) {
-        clearTimeout(this.#debounceTimer);
-        this.#debounceTimer = null;
+      if (this.#frameRequestId !== null) {
+        cancelAnimationFrame(this.#frameRequestId);
+        this.#frameRequestId = null;
       }
 
       this.#scheduler[Symbol.dispose]();

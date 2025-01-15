@@ -1,4 +1,4 @@
-import { EcsResource } from 'bim-ecs/resources';
+import { EcsResource } from 'bim-ecs';
 
 export class Config extends EcsResource {
   width = 600;

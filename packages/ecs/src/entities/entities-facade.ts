@@ -1,6 +1,6 @@
 import { EntityPool } from './entity-pool';
 import { QueryEngine } from '../querying';
-import { type EcsComponent } from '../components';
+import { type EcsComponent, type EcsComponentCtor } from '../components';
 import type { EntityId } from './entity-id';
 import type { QueryDefinition } from '../querying/query-definition';
 
@@ -23,6 +23,14 @@ export class EntitiesFacade implements Partial<EntityPool> {
   /** @inheritDoc */
   public componentsOf(entityId: EntityId) {
     return this.pool.componentsOf(entityId);
+  }
+
+  /** Provides a component for specified entity */
+  public componentOf<TComponent extends EcsComponent<any>>(
+    entityId: EntityId,
+    componentType: new (...args: any[]) => TComponent,
+  ) {
+    return this.pool.componentsOf(entityId).get(componentType);
   }
 
   /** @inheritDoc */

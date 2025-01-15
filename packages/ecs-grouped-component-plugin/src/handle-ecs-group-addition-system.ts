@@ -1,6 +1,4 @@
-import { defineSystem } from 'bim-ecs';
-import { on } from 'bim-ecs/scheduling';
-import { ECS_COMPONENT_LINK_ADDED } from 'bim-ecs/components';
+import { defineSystem, on, ECS_COMPONENT_LINK_ADDED } from 'bim-ecs';
 import { ECS_GROUP_COMPONENT, type EcsGroupedComponent } from './ecs-grouped-component';
 
 export const handleEcsGroupAdditionsSystem = defineSystem(

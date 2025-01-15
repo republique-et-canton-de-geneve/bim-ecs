@@ -1,14 +1,10 @@
-import { EcsPlugin } from 'bim-ecs';
-import { defineSystem } from 'bim-ecs';
-import { EcsComponent } from 'bim-ecs/components';
-import { startup, after } from 'bim-ecs/scheduling';
+import { EcsPlugin, EcsComponent, startup, after, defineSystem, entityRemoved } from 'bim-ecs';
 import { Config } from './config';
 import { BoxGeometry } from './box-geometry';
 import { initializePlateSystem, Plate, updatePlateSystem } from './plate';
 import { Ball, initializeBallSystem, updateBallSystem } from './ball';
 import { Name } from './common';
 import { initializeBricksSystem } from './brick';
-import { entityRemoved } from 'bim-ecs/scheduling';
 import { handleBrickDeletionScoreSystem, ScoreResource } from './score';
 
 export const renderingPlugin: EcsPlugin = (world) => {

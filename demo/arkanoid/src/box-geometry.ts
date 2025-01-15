@@ -1,5 +1,5 @@
 import { Config } from './config';
-import { EcsMutableComponent } from 'bim-ecs/components';
+import { EcsMutableComponent } from 'bim-ecs';
 
 /*
 scene coordinates :

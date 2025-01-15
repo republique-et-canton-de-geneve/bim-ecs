@@ -1,4 +1,4 @@
-import { EcsComponent } from 'bim-ecs/components';
+import { EcsComponent } from 'bim-ecs';
 import type { EcsGroupComponent } from './ecs-group-component';
 
 export const ECS_GROUP_COMPONENT = Symbol('ECS GROUP COMPONENT KEY');

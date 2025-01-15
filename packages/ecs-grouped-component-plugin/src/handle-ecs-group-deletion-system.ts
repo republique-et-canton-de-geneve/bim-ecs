@@ -1,7 +1,5 @@
-import { defineSystem } from 'bim-ecs';
-import { on } from 'bim-ecs/scheduling';
+import { defineSystem, on, ECS_COMPONENT_LINK_REMOVED } from 'bim-ecs';
 import { ECS_GROUP_COMPONENT, type EcsGroupedComponent } from './ecs-grouped-component';
-import { ECS_COMPONENT_LINK_REMOVED } from 'bim-ecs/components';
 
 export const handleEcsGroupDeletionsSystem = defineSystem(
   'ecs group deletion',

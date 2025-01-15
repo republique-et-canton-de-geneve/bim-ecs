@@ -18,43 +18,10 @@
       "require": "./dist/index.cjs",
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
-    },
-    "./resources": {
-      "require": "./dist/resources/index.cjs",
-      "import": "./dist/resources/index.js",
-      "types": "./dist/resources/index.d.ts"
-    },
-    "./systems": {
-      "require": "./dist/systems/index.cjs",
-      "import": "./dist/systems/index.js",
-      "types": "./dist/systems/index.d.ts"
-    },
-    "./event-bus": {
-      "require": "./dist/event-bus/index.cjs",
-      "import": "./dist/event-bus/index.js",
-      "types": "./dist/event-bus/index.d.ts"
-    },
-    "./scheduling": {
-      "require": "./dist/scheduling/index.cjs",
-      "import": "./dist/scheduling/index.js",
-      "types": "./dist/scheduling/index.d.ts"
-    },
-    "./scheduling/modifiers": {
-      "require": "./dist/scheduling/modifiers/index.cjs",
-      "import": "./dist/scheduling/modifiers/index.js",
-      "types": "./dist/scheduling/modifiers/index.d.ts"
-    },
-    "./components": {
-      "require": "./dist/components/index.cjs",
-      "import": "./dist/components/index.js",
-      "types": "./dist/components/index.d.ts"
-    },
-    "./entities": {
-      "require": "./dist/entities/index.cjs",
-      "import": "./dist/entities/index.js",
-      "types": "./dist/entities/index.d.ts"
     }
   },
+  "types": "./dist/index.d.ts",
+  "main":  "./dist/index.js",
   "scripts": {
     "build": "tsc -p tsconfig-build.json && vite build",
     "test": "vitest",

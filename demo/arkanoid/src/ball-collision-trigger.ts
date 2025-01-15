@@ -1,5 +1,3 @@
-import { EcsComponent } from 'bim-ecs/components';
-import { EcsEvent } from 'bim-ecs/event-bus';
-import { EntityId } from 'bim-ecs/entities';
+import { EcsComponent, EcsEvent, EntityId } from 'bim-ecs';
 
 export class BallCollisionTrigger extends EcsComponent<EcsEvent<{ obstacle: EntityId; ball: EntityId }>> {}

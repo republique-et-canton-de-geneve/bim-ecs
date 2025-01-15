@@ -1,7 +1,5 @@
-import { defineSystem } from 'bim-ecs';
-import { on } from 'bim-ecs/scheduling';
+import { defineSystem, ECS_ENTITY_SPAWNED, on } from 'bim-ecs';
 import { ECS_GROUP_COMPONENT, type EcsGroupedComponent } from './ecs-grouped-component';
-import { ECS_ENTITY_SPAWNED } from 'bim-ecs/entities';
 import { map } from '@bim-ecs/iterable';
 import type { EcsGroupComponent } from './ecs-group-component';
 

@@ -6,7 +6,8 @@
   "type": "module",
   "private": "true",
   "scripts": {
-    "start": "vite"
+    "start": "vite",
+    "build": "vite build"
   },
   "author": "Etat de Genève",
   "license": "Apache-2.0",

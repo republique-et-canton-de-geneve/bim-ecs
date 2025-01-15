@@ -67,7 +67,6 @@ export function debounce<T>(schedulersConstructor: SchedulerCtor<T>, delay: numb
 
     /** @inheritdoc */
     [Symbol.dispose]() {
-      // Updates the dispose state
       if (this.#isDisposed) return;
       this.#isDisposed = true;
 

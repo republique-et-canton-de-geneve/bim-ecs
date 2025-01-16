@@ -1,10 +1,14 @@
 {
   "name": "@bim-ecs/tuple-collections",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org ",
+    "access": "public"
+  },
   "exports": {
     ".": {
       "import": "./dist/index.js",

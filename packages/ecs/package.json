@@ -13,7 +13,7 @@
     "BIM"
   ],
   "private": false,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "license": "Apache-2.0",
   "exports": {
@@ -43,7 +43,7 @@
     "playwright": "^1.49.1"
   },
   "dependencies": {
-    "@bim-ecs/iterable": "0.0.2",
-    "@bim-ecs/tuple-collections": "0.0.2"
+    "@bim-ecs/iterable": "0.0.3",
+    "@bim-ecs/tuple-collections": "0.0.3"
   }
 }

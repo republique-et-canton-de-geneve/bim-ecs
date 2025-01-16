@@ -28,8 +28,7 @@
   "scripts": {
     "build": "tsc -p tsconfig-build.json && vite build",
     "test": "vitest",
-    "test:browser": "vitest --browser",
-    "prepublish": "npm run build"
+    "test:browser": "vitest --browser"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",

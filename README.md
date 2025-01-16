@@ -545,6 +545,6 @@ It definitely helps and these will be considered with care !
 ## NPM publication 
 
 - `npm run sync-packages-versions`
-- `npm i`
+- `npm install`
 - build all
 - `npm publish --workspaces=true`

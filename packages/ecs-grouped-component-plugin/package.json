@@ -2,6 +2,10 @@
   "name": "@bim-ecs/grouped-component-plugin",
   "author": "Etat de Genève",
   "description": "bim-ecs plugin for grouped components",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
   "keywords": [
     "ECS",
     "Game engine",

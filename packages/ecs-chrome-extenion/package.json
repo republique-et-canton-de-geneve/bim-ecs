@@ -1,5 +1,6 @@
 {
   "name": "@bim-ecs/chrome-extension",
+  "private": true,
   "version": "0.0.0",
   "description": "A chrome extension to handle ECS debugging",
   "main": "index.js",

@@ -2,6 +2,9 @@
   "name": "bim-ecs",
   "author": "Etat de Genève",
   "description": "Typescript ECS library implementation",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org "
+  },
   "keywords": [
     "ECS",
     "Game engine",
@@ -25,7 +28,8 @@
   "scripts": {
     "build": "tsc -p tsconfig-build.json && vite build",
     "test": "vitest",
-    "test:browser": "vitest --browser"
+    "test:browser": "vitest --browser",
+    "prepublish": "npm run build"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",

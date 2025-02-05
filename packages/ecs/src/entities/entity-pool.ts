@@ -6,6 +6,7 @@ import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from './entities-events';
 import { map } from '@bim-ecs/iterable';
 import type { Archetype } from '../querying/_archetype';
 import { ComponentsTracker } from '../components/components-tracker';
+import type { InitSession } from '../world/init-session';
 
 /** Handles ECS entities life cycle */
 export class EntityPool implements Disposable {
@@ -16,7 +17,7 @@ export class EntityPool implements Disposable {
   /** Entity / components association */
   public readonly componentsByEntity = new Map<EntityId, Set<EcsComponent<unknown>>>();
 
-  constructor(private readonly world: Pick<EcsWorld, 'bus'>) {
+  constructor(private readonly world: Pick<EcsWorld, 'bus'> & Partial<Pick<EcsWorld, 'currentInitSession'>>) {
     this.componentsTracker = new ComponentsTracker(this.world);
   }
 
@@ -30,7 +31,12 @@ export class EntityPool implements Disposable {
     this.componentsByEntity.set(entity, new Set(components));
 
     // Event
-    this.world.bus.publish(ECS_ENTITY_SPAWNED, { entity, components });
+    if(!this.world.currentInitSession) {
+      this.world.bus.publish(ECS_ENTITY_SPAWNED, { entity, components });
+    } else {
+      // Event delayed at the end of the initialization session
+      (this.world.currentInitSession as InitSession).registerEntity(entity)
+    }
 
     // Returning created entity id
     return entity;
@@ -41,6 +47,8 @@ export class EntityPool implements Disposable {
    * @param entity
    */
   public remove(entity: EntityId) {
+    if(this.world.currentInitSession) throw new Error('Entity cannot be removed during init session!')
+
     const components = this.componentsByEntity.get(entity);
     if (components) {
       this.componentsByEntity.delete(entity);
@@ -94,7 +102,9 @@ export class EntityPool implements Disposable {
     if (entityComponents) {
       for (const component of components) {
         entityComponents.add(component);
-        this.world.bus.publish(ECS_COMPONENT_LINK_ADDED, { entity, component });
+        if(!this.world.currentInitSession) {
+          this.world.bus.publish(ECS_COMPONENT_LINK_ADDED, { entity, component });
+        }
         // TODO prevent components doublons
       }
       return true;
@@ -116,7 +126,9 @@ export class EntityPool implements Disposable {
       for (const component of components) {
         if (types.includes(component.constructor as typeof EcsComponent<any>)) {
           components.delete(component);
-          this.world.bus.publish(ECS_COMPONENT_LINK_REMOVED, { entity, component });
+          if(!this.world.currentInitSession) {
+            this.world.bus.publish(ECS_COMPONENT_LINK_REMOVED, { entity, component });
+          }
           removed = true;
         }
       }

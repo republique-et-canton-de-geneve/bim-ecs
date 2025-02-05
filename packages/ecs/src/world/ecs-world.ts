@@ -15,16 +15,24 @@ import {
 } from '../systems/system-events';
 import { ECS_WORLD_DISPOSING_EVENT, ECS_WORLD_RUNNING_EVENT, ECS_WORLD_STOPPING_EVENT } from './world-events';
 import { EcsResource } from '../resources';
-import { EntityPool } from '../entities';
+import { ECS_ENTITY_SPAWNED, EntityPool } from '../entities';
 import type { EcsPlugin } from './ecs-plugin';
 import { DebugTracker } from '../debug/debug-tracker';
 import { QueryEngine } from '../querying';
 import { EntitiesFacade } from '../entities/entities-facade';
+import { InitSession } from './init-session';
 
 /** ECS world handling the overall ECS life cycle */
 export class EcsWorld implements Disposable {
+  #currentInitSession: InitSession | null = null;
+
   get running() {
     return this.systems.isRunning;
+  }
+
+  /** Provides the current init session if available */
+  get currentInitSession() {
+    return this.#currentInitSession as Disposable
   }
 
   /** Events bus */
@@ -86,6 +94,27 @@ export class EcsWorld implements Disposable {
    */
   public use(plugin: EcsPlugin) {
     return plugin(this);
+  }
+
+  /**
+   * Open a session during which querying is not available and entities spawning only will be taken into account at the end of the session.
+   * > Components modifications will be taken into account as if they have been associated to entities at spawning time.
+   */
+  public openInitSession() {
+    if(this.#currentInitSession) {
+      console.warn('Init session already opened. Please close existing before opening a new one!')
+      return this.#currentInitSession
+    }
+
+    return (this.#currentInitSession = new InitSession(() => {
+      if(this.#currentInitSession) {
+        for (const entity of this.#currentInitSession.spawnEntities) {
+          this.bus.publish(ECS_ENTITY_SPAWNED, { entity, components: Array.from(this.entityPool.componentsOf(entity).values()) });
+        }
+
+        this.#currentInitSession = null;
+      }
+    })) as Disposable;
   }
 
   /** @inheritdoc */

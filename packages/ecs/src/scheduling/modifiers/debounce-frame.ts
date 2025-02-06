@@ -39,14 +39,9 @@ export function debounceFrame<T>(schedulersConstructor: SchedulerCtor<T>): Sched
       };
 
       const handleChildNext = (payload: T) => {
-        if (this.#isDisposed) return;
+        if (this.#frameRequestId !== null || this.#isDisposed) return;
 
         this.#lastPayload = payload;
-
-        if (this.#frameRequestId !== null) {
-          cancelAnimationFrame(this.#frameRequestId);
-        }
-
         this.#frameRequestId = requestAnimationFrame(() => {
           if (this.#frameRequestId !== null) {
             next(this.#lastPayload as T);

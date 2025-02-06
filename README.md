@@ -534,6 +534,42 @@ const world = new EcsWorld();
 world.use(FooPlugin);
 ```
 
+## Performances consideration
+The bim-ecs library is optimized primarily for fast querying. Any read/write/update operation on entity updates some indexes tables to guaranty fast query result as possible, with the cost
+of the indexes tables update.
+
+Components addition/removal is the slowest operation in the library: Prefer spawning entities with the whole component set instead of creating an entity and updating it afterward.
+
+If for some reason this is not possible (example: Some components could contain some reference to spawned entities -> These reference components should probably be added once entities are spawned),
+an initialization session can be open to reduce entity mutation overhead:
+
+```typescript
+import { EcsWorld } from 'bim-ecs';
+
+const world = new EcsWorld()
+
+{
+  // Init session scope
+  using _ = world.openInitSession()
+
+  const entity = world.entities.spawn([new MyComponent1('foo')])
+  // [...]
+  world.entities.addComponent(new MyComponent2('bar')) // <- Very fast in this context
+  
+  // End of init session scope
+}
+
+// world is running normally from here
+```
+
+This `initSession` scope should only be used for entity initialization. 
+- Entity spawning
+- Components associations (only for entities added during this scope !)
+
+Some operations are not available during the session and should not be attempted :
+- Querying
+- Entity deletion
+
 ## How to contribute
 
 If your project match our needs, you may be interested in some additional features or improvements. As such, contribution is very welcome.  

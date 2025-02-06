@@ -2,7 +2,46 @@
 
 (From Wikipedia) Entity–component–system (ECS) is a software architectural pattern mostly used in video game development for the representation of game world objects. An ECS comprises entities composed from components of data, with systems which operate on the components.
 
-> **Warning:** This library is still under heavy development.
+## Quick start
+`npm i bim-ecs@latest`
+
+```typescript
+import { defineSystem, EcsComponent, EcsEvent, EcsWorld, startup } from 'bim-ecs';
+
+// Components
+class NameComponent extends EcsComponent<string> {}
+class AgeComponent extends EcsComponent<number> {}
+class HumanComponent extends EcsComponent {}
+class AnimalComponent extends EcsComponent {}
+
+// Events
+const CLICKED_EVENT = Symbol('CLICKED_EVENT') as EcsEvent<PointerEvent>
+
+// Systems
+const initDataSystem = defineSystem('init data', ({ entities }) => {
+  entities.spawn(new HumanComponent(), new NameComponent('Fred'), new AgeComponent(35))
+  entities.spawn(new HumanComponent(), new NameComponent('Janett'), new AgeComponent(26))
+  entities.spawn(new AnimalComponent(), new NameComponent('Teddy'), new AgeComponent(3))
+}, startup)
+
+const initInteractionsSystem = defineSystem('init interactions', ({ bus }) => {
+  document.addEventListener('click', (e) => bus.publish(CLICKED_EVENT, e))
+}, startup)
+
+const listHumansSystem = defineSystem('list humans', ({ entities }) => {
+  const humanEntities = entities.query(() => [HumanComponent])
+  for (const entity of humanEntities) {
+    console.log('Humans', Array.from(entities.componentsOf(entity).values()))
+  }
+}, on(CLICKED_EVENT))
+
+/** World instance */
+const world = new EcsWorld()
+  .registerSystem(initDataSystem)
+  .registerSystem(initInteractionsSystem)
+  .registerSystem(listHumansSystem)
+  .run()
+```
 
 ## What this ECS implementation is designed for :
 
@@ -24,9 +63,9 @@ Systems parallelization
 
 ## Structure overview
 
-ECS implements a world, hosting Entities, Components and systems.  
-Entities are fetched from world with queries.  
-Additional features such as `Resources`, `Scheduler`, `EventBus` adds convenient mechanisms to interact with the world (according to dedicated finality)
+BIM-ECS implements a world, hosting Entities, Components and systems.  
+Entities are fetched from world using queries.  
+Additional features such as `Resources`, `Scheduler`, `EventBus` adds convenient mechanisms to interact with the world and your application.
 
 ```mermaid
 flowchart LR
@@ -35,12 +74,12 @@ flowchart LR
     World---Components[["Components"]]
     Components-.-Entities[["Entities"]]
     World---Systems[["Systems"]]
-    World----Resources(["Resources"])
-    Systems-.-Resources
-    Systems-.-Queries(["Queries"])
+    Components-.-Queries
     Systems-.-Schedulers(["Schedulers"])
+    Systems-.-Resources
+    World----Resources(["Resources"])
+    Systems-.-Queries(["Queries"])
     Schedulers -.- EventBus(["EventBus"])
-    Systems -.- EventBus(["EventBus"])
 ```
 
 **Show me the code :**

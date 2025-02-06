@@ -13,7 +13,7 @@
     "BIM"
   ],
   "private": false,
-  "version": "0.0.0",
+  "version": "0.0.3",
   "type": "module",
   "license": "Apache-2.0",
   "exports": {
@@ -24,17 +24,16 @@
     }
   },
   "types": "./dist/index.d.ts",
-  "main":  "./dist/index.js",
+  "main": "./dist/index.js",
   "scripts": {
     "build": "tsc -p tsconfig-build.json && vite build",
     "test": "vitest",
-    "test:browser": "vitest --browser",
-    "prepublish": "npm run build"
+    "test:browser": "vitest --browser"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
     "@types/node": "^22.9.0",
-    "@vitest/browser":  "^2.1.8",
+    "@vitest/browser": "^2.1.8",
     "typescript": "~5.6.2",
     "vite": "^5.4.10",
     "vitest": "^2.1.4",
@@ -44,7 +43,7 @@
     "playwright": "^1.49.1"
   },
   "dependencies": {
-    "@bim-ecs/iterable": "^0.0.0",
-    "@bim-ecs/tuple-collections": "^0.0.0"
+    "@bim-ecs/iterable": "0.0.3",
+    "@bim-ecs/tuple-collections": "0.0.3"
   }
 }

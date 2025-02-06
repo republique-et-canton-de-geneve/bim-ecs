@@ -541,3 +541,10 @@ If this library is currently used for "État de Genève" BIM project, there are 
 
 In any case, feel free to create an issue or a pull request if you have any feedback or suggestion about the current implementation.  
 It definitely helps and these will be considered with care !
+
+## NPM publication 
+
+- `npm run sync-packages-versions`
+- `npm install`
+- build all
+- `npm publish --workspaces=true`

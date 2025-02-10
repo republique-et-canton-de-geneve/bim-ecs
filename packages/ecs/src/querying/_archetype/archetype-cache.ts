@@ -1,3 +1,5 @@
+// noinspection DuplicatedCode
+
 import { ArchetypeMaskMap } from './archetype-mask-map';
 import { type EntityId, EntityPool } from '../../entities';
 import { archetypeFromComponents, type ArchetypeMask } from './archetype';
@@ -51,7 +53,7 @@ export class ArchetypeCache implements Disposable {
     if (existingMaskAssociation) {
       // Removing entityId from entitiesByArchetypeMask
       const currentEntitySet = this.entitiesByArchetypeMask.get(existingMaskAssociation);
-      currentEntitySet?.delete(entityId);
+      currentEntitySet!.delete(entityId); // Should always be synchronized, `?.` would be a performance loss here
 
       // Removing entityId from archetypeMaskByEntity
       this.archetypeMaskByEntity.delete(entityId);
@@ -59,11 +61,27 @@ export class ArchetypeCache implements Disposable {
   }
 
   private handleModifiedEntity(entityId: EntityId) {
-    // Removing entity
-    this.handleRemovedEntity(entityId);
+    const existingMaskAssociation = this.archetypeMaskByEntity.get(entityId);
+    if(existingMaskAssociation) {
+      // Removing entityId from entitiesByArchetypeMask
+      const currentEntitySet = this.entitiesByArchetypeMask.get(existingMaskAssociation);
+      currentEntitySet!.delete(entityId); // Should always be synchronized, `?.` would be a performance loss here
 
-    // Adding entity back
-    this.handleAddedEntity(entityId);
+      // New mask creation
+      const archetype = archetypeFromComponents(this.entityPool.componentsByEntity.get(entityId) ?? []);
+      const mask = archetypeMaskFor(archetype, this.counter);
+
+      // --> entitiesByArchetypeMask registration
+      const existingEntitySet = this.entitiesByArchetypeMask.get(mask);
+      if (existingEntitySet) {
+        existingEntitySet.add(entityId);
+      } else {
+        this.entitiesByArchetypeMask.set(mask, new Set<EntityId>([entityId]));
+      }
+
+      // --> archetypeMaskByEntity update
+      this.archetypeMaskByEntity.set(entityId, mask);
+    }
   }
 
   [Symbol.dispose]() {

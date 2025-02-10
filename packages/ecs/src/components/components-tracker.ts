@@ -1,11 +1,10 @@
 import { EcsWorld } from '../world';
-import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from '../entities/entities-events';
+import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED, type EntityId } from '../entities';
 import {
   ECS_COMPONENT_LINK_ADDED,
   ECS_COMPONENT_LINK_REMOVED,
   ECS_MUTABLE_COMPONENT_VALUE_CHANGED,
 } from './ecs-component-events';
-import type { EntityId } from '../entities';
 import type { EcsComponent } from './ecs-component';
 import { EcsMutableComponent } from './ecs-mutable-component';
 

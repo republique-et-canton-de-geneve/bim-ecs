@@ -110,7 +110,7 @@ export class QueryEngine implements Disposable {
 
     /** Strategy shortcut with no result */
     function* runVoidStrategy(): Generator<EntityId> {
-      return;
+      yield* [];
     }
 
     /** Strategy using only archetype masks as input for query processing */

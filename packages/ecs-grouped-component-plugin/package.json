@@ -14,7 +14,7 @@
     "BIM"
   ],
   "private": false,
-  "version": "0.0.8",
+  "version": "0.0.8-0",
   "type": "module",
   "license": "Apache-2.0",
   "types": "./dist/index.d.ts",
@@ -43,6 +43,6 @@
     "playwright": "^1.49.1"
   },
   "peerDependencies": {
-    "bim-ecs": "0.0.8"
+    "bim-ecs": "0.0.8-0"
   }
 }

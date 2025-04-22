@@ -100,14 +100,22 @@ export class EntityPool implements Disposable {
   public addComponent(entity: EntityId, ...components: EcsComponent<any>[]) {
     const entityComponents = this.componentsByEntity.get(entity);
     if (entityComponents) {
+      let added = false;
       for (const component of components) {
-        entityComponents.add(component);
-        if(!this.world.currentInitSession) {
-          this.world.bus.publish(ECS_COMPONENT_LINK_ADDED, { entity, component });
+
+        // Prevents component instances doublons (add is ensuring no doublons occurs, but later notification could mess up entity components pool)
+        if(!entityComponents.has(component)) {
+          entityComponents.add(component);
+          if (!this.world.currentInitSession) {
+            this.world.bus.publish(ECS_COMPONENT_LINK_ADDED, { entity, component });
+          }
+
+          added = true
         }
-        // TODO prevent components doublons
+
+        // TODO prevent components types doublons
       }
-      return true;
+      return added;
     }
   }
 

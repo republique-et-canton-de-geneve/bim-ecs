@@ -220,6 +220,39 @@ describe('QueryEngine', () => {
       expect(result).not.includes(spawnedEntities[4]);
     });
 
+    it('should aggregate indexed components', () => {
+      const bus = new EventBus();
+      const entities = new EntityPool({ bus });
+      const query = new QueryEngine({ bus }, entities);
+
+      class Component1 extends EcsIndexedComponent<number> {}
+      class Component2 extends EcsIndexedComponent<string> {}
+      class Component3 extends EcsComponent {}
+
+      const spawnedEntities = [
+        entities.spawn(new Component1(0), new Component1(5), new Component2('foo')),
+        entities.spawn(new Component1(5), new Component3()),
+      ];
+
+      const result1 = [...query.execute(({ withValue }) => [withValue(Component1, 0)])];
+      expect(result1).toHaveLength(1);
+      expect(result1[0]).toEqual(spawnedEntities[0]);
+
+      const result2 = [...query.execute(({ withValue }) => [withValue(Component1, 5)])];
+      expect(result2).toHaveLength(2);
+      expect(result2).includes(spawnedEntities[0]);
+      expect(result2).includes(spawnedEntities[1]);
+
+      const result3 = [...query.execute(({ withValue }) => [Component3, withValue(Component1, 5)])];
+      expect(result3).toHaveLength(1);
+      expect(result3[0]).toEqual(spawnedEntities[1]);
+
+      const result4 = [...query.execute(() => [Component1])];
+      expect(result4).toHaveLength(2);
+      expect(result4).includes(spawnedEntities[0]);
+      expect(result4).includes(spawnedEntities[1]);
+    });
+
     it('should execute query with mixed entities', () => {
       const bus = new EventBus();
       const entities = new EntityPool({ bus });

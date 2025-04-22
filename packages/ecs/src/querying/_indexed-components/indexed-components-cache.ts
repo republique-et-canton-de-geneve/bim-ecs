@@ -1,14 +1,19 @@
 import { EcsWorld } from '../../world';
-import { EcsComponent, EcsIndexedComponent } from '../../components';
+import {
+  ECS_COMPONENT_LINK_ADDED,
+  ECS_COMPONENT_LINK_REMOVED,
+  EcsComponent,
+  EcsIndexedComponent,
+} from '../../components';
 import type { EntityId } from '../../entities';
-import { TupleMap } from '@bim-ecs/tuple-collections';
-import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from '../../entities/entities-events';
-import { ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED } from '../../components/ecs-component-events';
+import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from '../../entities';
+import { EntitiesByComponentRepository } from './entities-by-component-repository';
 
 /** Handles indexed components value caching */
 export class IndexedComponentsCache implements Disposable {
   #disposals = [] as Function[];
-  public readonly entitiesByComponentValues = new TupleMap<[typeof EcsIndexedComponent<any>, any], Set<EntityId>>();
+
+  public readonly entitiesByComponentValues = new EntitiesByComponentRepository();
 
   constructor(world: Pick<EcsWorld, 'bus'>) {
     this.#disposals.push(

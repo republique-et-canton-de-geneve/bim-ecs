@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { EventBus } from '../../event-bus';
 import { IndexedComponentsCache } from './indexed-components-cache';
-import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from '../../entities/entities-events';
+import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from '../../entities';
 import { EcsComponent, EcsIndexedComponent } from '../../components';
 
 describe('indexedComponentsCache', () => {

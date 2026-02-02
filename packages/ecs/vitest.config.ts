@@ -1,6 +1,7 @@
 import { fileURLToPath } from 'node:url';
 import { mergeConfig, defineConfig, configDefaults } from 'vitest/config';
 import viteConfig from './vite.config';
+import { playwright } from '@vitest/browser-playwright';
 
 export default mergeConfig(
   viteConfig,
@@ -11,9 +12,12 @@ export default mergeConfig(
       // @ts-ignore
       root: fileURLToPath(new URL('./', import.meta.url)),
       browser: {
-        provider: 'playwright', // or 'webdriverio'
-        name: 'chromium',
-        api: 33020,
+        provider: playwright({
+          launchOptions: {
+            channel: 'chrome',
+          },
+        }),
+        instances: [{ browser: 'chromium' }],
       },
     },
   }),

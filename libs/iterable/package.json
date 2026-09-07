@@ -23,7 +23,9 @@
     "@types/node": "catalog:",
     "jsdom": "^29.1.1",
     "vite": "catalog:",
+    "vitest": "catalog:",
     "vite-plugin-dts": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "catalog:",
+    "@typescript/typescript6": "catalog:"
   }
 }

@@ -23,6 +23,6 @@
     "prepublish": "node ./cli/readme/copy-readme.js"
   },
   "devDependencies": {
-    "prettier": "^3.3.3"
+    "prettier": "^3.9.6"
   }
 }

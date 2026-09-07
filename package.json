@@ -17,20 +17,12 @@
     "./demo/*"
   ],
   "scripts": {
-    "build": "nx run-many -t build",
-    "demo:arkanoid": "nx run  \"@bim/ecs-akanoid:start\"",
-    "graph": "nx graph",
+    "build:all": "pnpm --filter bim-ecs... build && pnpm --filter @bim-ecs/grouped-component-plugin... build",
+    "start:demo-arkanoid": "pnpm --filter @bim-ecs/ecs-arkanoid... build && pnpm --filter @bim-ecs/ecs-arkanoid... start",
     "sync-packages-versions": "node ./cli/versions/sync-package-versions.js",
     "prepublish": "node ./cli/readme/copy-readme.js"
   },
   "devDependencies": {
-    "nx": "20.1.0",
-    "prettier": "^3.3.3",
-    "vite": "^7.3.1",
-    "vitest": "^4.0.18",
-    "@vitest/browser": "^4.0.18",
-    "@vitest/browser-playwright": "^4.0.18",
-    "vite-plugin-dts": "^4.5.4",
-    "typescript": "~5.6.2"
+    "prettier": "^3.3.3"
   }
 }

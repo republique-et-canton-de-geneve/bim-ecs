@@ -1,15 +1,18 @@
 import { Scheduler } from './scheduler';
 
+/** Constructs a Scheduler with the same signature as Scheduler itself */
+export type SchedulerConstructor<T> = new (...args: ConstructorParameters<typeof Scheduler<T>>) => Scheduler<T>;
+
 /**
  *  Schedules execution each specified interval
  * @param delay The delay between intervals
  */
-export const timer = (delay: number) =>
+export const timer = (delay: number): SchedulerConstructor<number> =>
   class extends Scheduler<number> {
     #timeoutId: number | undefined;
 
     /** @inheritdoc */
-    public run(next: (payload: number) => void) {
+    run(next: (payload: number) => void) {
       this.#timeoutId = setTimeout(next, delay);
     }
 

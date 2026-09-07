@@ -12,7 +12,7 @@ let i = 0;
 export function debounce<T>(schedulersConstructor: SchedulerCtor<T>, delay: number): SchedulerCtor<T> {
   return class extends Scheduler<T> {
     #_internalId = i++;
-    #debounceTimer: NodeJS.Timeout | null = null;
+    #debounceTimer: ReturnType<typeof setTimeout> | null = null;
     #lastPayload: T | undefined = undefined;
     #isDisposed = false;
 

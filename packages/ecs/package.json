@@ -31,13 +31,17 @@
     "test:browser": "vitest --browser"
   },
   "devDependencies": {
-    "@types/jsdom": "^21.1.7",
-    "@types/node": "^22.9.0",
-    "jsdom": "^24.1.0",
-    "glob": "13.0.0"
+    "vite": "catalog:",
+    "@types/jsdom": "^28.0.3",
+    "@types/node": "catalog:",
+    "jsdom": "^28.1.0",
+    "glob": "^13.0.6"
   },
   "dependencies": {
-    "@bim-ecs/iterable": "0.0.10",
-    "@bim-ecs/tuple-collections": "0.0.10"
+    "@bim-ecs/iterable": "workspace:*",
+    "@bim-ecs/tuple-collections": "workspace:*",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "typescript": "catalog:"
   }
 }

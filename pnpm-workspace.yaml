@@ -1,0 +1,17 @@
+packages:
+  - './packages/*'
+  - './libs/*'
+  - './demo/*'
+
+catalog:
+  "typescript": "^6.0.3"
+  "@types/node": "^22.9.0"
+  "vite": "^8.1.3"
+  "vitest": "^4.1.9"
+  "@vitest/browser": "^4.1.9"
+  "@vitest/browser-playwright": "^4.1.9"
+  "vite-plugin-dts": "^5.0.3"
+
+injectWorkspacePackages: true
+syncInjectedDepsAfterScripts:
+  - build

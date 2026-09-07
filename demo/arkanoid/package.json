@@ -12,6 +12,6 @@
   "author": "Etat de Genève",
   "license": "Apache-2.0",
   "dependencies": {
-    "bim-ecs": "0.0.10"
+    "bim-ecs": "workspace:*"
   }
 }

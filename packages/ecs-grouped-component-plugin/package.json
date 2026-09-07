@@ -30,13 +30,19 @@
     "test": "vitest",
     "test:browser": "vitest --browser"
   },
+  "dependencies": {
+    "@bim-ecs/iterable": "workspace:*"
+  },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
-    "@types/node": "^22.9.0",
-    "jsdom": "^24.1.0",
-    "playwright": "^1.49.1"
+    "@types/node": "catalog:",
+    "jsdom": "^29.1.1",
+    "playwright": "^1.49.1",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "typescript": "catalog:"
   },
   "peerDependencies": {
-    "bim-ecs": "0.0.10"
+    "bim-ecs": "workspace:*"
   }
 }

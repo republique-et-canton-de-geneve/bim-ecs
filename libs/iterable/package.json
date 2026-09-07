@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org ",
+    "registry": "https://registry.npmjs.org",
     "access": "public"
   },
   "exports": {
@@ -20,7 +20,10 @@
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
-    "@types/node": "^22.9.0",
-    "jsdom": "^24.1.0"
+    "@types/node": "catalog:",
+    "jsdom": "^29.1.1",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "typescript": "catalog:"
   }
 }

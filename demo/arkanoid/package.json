@@ -1,6 +1,6 @@
 {
   "name": "@bim-ecs/ecs-arkanoid",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "A demo project with BIM ECS implementing Arkanoid",
   "main": "index.js",
   "type": "module",
@@ -12,6 +12,6 @@
   "author": "Etat de Genève",
   "license": "Apache-2.0",
   "dependencies": {
-    "bim-ecs": "workspace:*"
+    "bim-ecs": "0.0.11"
   }
 }

@@ -10,7 +10,7 @@
   ],
   "license": "Apache-2.0",
   "private": true,
-  "version": "0.0.10",
+  "version": "0.0.11",
   "workspaces": [
     "./packages/*",
     "./libs/*",
@@ -23,6 +23,7 @@
     "prepublish": "node ./cli/readme/copy-readme.js"
   },
   "devDependencies": {
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.6",
+    "glob": "^13.0.6"
   }
 }

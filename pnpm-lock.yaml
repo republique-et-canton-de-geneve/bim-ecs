@@ -30,6 +30,9 @@ importers:
 
   .:
     devDependencies:
+      glob:
+        specifier: ^13.0.6
+        version: 13.0.6
       prettier:
         specifier: ^3.9.6
         version: 3.9.6

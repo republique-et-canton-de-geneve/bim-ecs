@@ -13,7 +13,7 @@
     "BIM"
   ],
   "private": false,
-  "version": "0.0.10",
+  "version": "0.0.11",
   "type": "module",
   "license": "Apache-2.0",
   "exports": {
@@ -38,8 +38,8 @@
     "glob": "^13.0.6"
   },
   "dependencies": {
-    "@bim-ecs/iterable": "workspace:*",
-    "@bim-ecs/tuple-collections": "workspace:*",
+    "@bim-ecs/iterable": "0.0.11",
+    "@bim-ecs/tuple-collections": "0.0.11",
     "vite": "catalog:",
     "vite-plugin-dts": "catalog:",
     "typescript": "catalog:"

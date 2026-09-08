@@ -39,9 +39,9 @@ importers:
 
   demo/arkanoid:
     dependencies:
-      bim-ecs:
+      '@state-of-geneva/bim-ecs':
         specifier: workspace:*
-        version: file:packages/ecs(@types/node@22.20.1)
+        version: link:../../packages/ecs
 
   libs/iterable:
     devDependencies:
@@ -105,15 +105,6 @@ importers:
       '@bim-ecs/tuple-collections':
         specifier: workspace:*
         version: link:../../libs/tuple-collections
-      typescript:
-        specifier: 'catalog:'
-        version: 7.0.2
-      vite:
-        specifier: 'catalog:'
-        version: 8.2.2(@types/node@22.20.1)
-      vite-plugin-dts:
-        specifier: 'catalog:'
-        version: 5.1.0(rolldown@1.2.7)(typescript@7.0.2)(vite@8.2.2(@types/node@22.20.1))
     devDependencies:
       '@types/jsdom':
         specifier: ^28.0.3
@@ -127,6 +118,15 @@ importers:
       jsdom:
         specifier: ^28.1.0
         version: 28.1.0
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+      vite:
+        specifier: 'catalog:'
+        version: 8.2.2(@types/node@22.20.1)
+      vite-plugin-dts:
+        specifier: 'catalog:'
+        version: 5.1.0(rolldown@1.2.7)(typescript@7.0.2)(vite@8.2.2(@types/node@22.20.1))
 
   packages/ecs-chrome-extenion: {}
 
@@ -135,9 +135,9 @@ importers:
       '@bim-ecs/iterable':
         specifier: workspace:*
         version: link:../../libs/iterable
-      bim-ecs:
+      '@state-of-geneva/bim-ecs':
         specifier: workspace:*
-        version: file:packages/ecs(@types/node@22.20.1)(rolldown@1.2.7)
+        version: link:../ecs
     devDependencies:
       '@types/jsdom':
         specifier: ^21.1.7
@@ -183,12 +183,6 @@ packages:
 
   '@asamuzakjp/nwsapi@2.3.9':
     resolution: {integrity: sha512-n8GuYSrI9bF7FFZ/SjhwevlHc8xaVlb/7HmHelnc/PZXBD2ZR49NnN9sMMuDdEGPeeRQ5d0hqlSlEpgCX3Wl0Q==}
-
-  '@bim-ecs/iterable@file:libs/iterable':
-    resolution: {directory: libs/iterable, type: directory}
-
-  '@bim-ecs/tuple-collections@file:libs/tuple-collections':
-    resolution: {directory: libs/tuple-collections, type: directory}
 
   '@bramus/specificity@2.4.2':
     resolution: {integrity: sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw==}
@@ -553,9 +547,6 @@ packages:
 
   bidi-js@1.1.0:
     resolution: {integrity: sha512-fX1Onk0tdVPC7obPWB5EbJ1z7NVhLq4m2xZLq2YXBkxzMXIGRpNMU88n0EPgWseKl12J7zXs7qrDxPK4sRs2fg==}
-
-  bim-ecs@file:packages/ecs:
-    resolution: {directory: packages/ecs, type: directory}
 
   brace-expansion@5.0.9:
     resolution: {integrity: sha512-ScQ4IuvIEF1TMlP7Zt+vjJ//9zlPb2SDcxWxM3bk8s6t6GGdJ7KO1dCcTidOPJKePW30LE/2cT7wCyPho9/Wxg==}
@@ -1129,10 +1120,6 @@ snapshots:
 
   '@asamuzakjp/nwsapi@2.3.9': {}
 
-  '@bim-ecs/iterable@file:libs/iterable': {}
-
-  '@bim-ecs/tuple-collections@file:libs/tuple-collections': {}
-
   '@bramus/specificity@2.4.2':
     dependencies:
       css-tree: 3.2.1
@@ -1363,62 +1350,6 @@ snapshots:
   bidi-js@1.1.0:
     dependencies:
       require-from-string: 2.0.2
-
-  bim-ecs@file:packages/ecs(@types/node@22.20.1):
-    dependencies:
-      '@bim-ecs/iterable': file:libs/iterable
-      '@bim-ecs/tuple-collections': file:libs/tuple-collections
-      typescript: 6.0.3
-      vite: 8.2.2(@types/node@22.20.1)
-      vite-plugin-dts: 5.1.0(typescript@6.0.3)(vite@8.2.2(@types/node@22.20.1))
-    transitivePeerDependencies:
-      - '@microsoft/api-extractor'
-      - '@rspack/core'
-      - '@types/node'
-      - '@vitejs/devtools'
-      - '@vue/language-core'
-      - esbuild
-      - jiti
-      - less
-      - rolldown
-      - rollup
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-      - tsx
-      - webpack
-      - yaml
-
-  bim-ecs@file:packages/ecs(@types/node@22.20.1)(rolldown@1.2.7):
-    dependencies:
-      '@bim-ecs/iterable': file:libs/iterable
-      '@bim-ecs/tuple-collections': file:libs/tuple-collections
-      typescript: 6.0.3
-      vite: 8.2.2(@types/node@22.20.1)
-      vite-plugin-dts: 5.1.0(rolldown@1.2.7)(typescript@6.0.3)(vite@8.2.2(@types/node@22.20.1))
-    transitivePeerDependencies:
-      - '@microsoft/api-extractor'
-      - '@rspack/core'
-      - '@types/node'
-      - '@vitejs/devtools'
-      - '@vue/language-core'
-      - esbuild
-      - jiti
-      - less
-      - rolldown
-      - rollup
-      - sass
-      - sass-embedded
-      - stylus
-      - sugarss
-      - supports-color
-      - terser
-      - tsx
-      - webpack
-      - yaml
 
   brace-expansion@5.0.9:
     dependencies:
@@ -1797,24 +1728,6 @@ snapshots:
 
   undici@7.29.1: {}
 
-  unplugin-dts@1.1.0(rolldown@1.2.7)(typescript@6.0.3)(vite@8.2.2(@types/node@22.20.1)):
-    dependencies:
-      '@rollup/pluginutils': 5.4.0
-      '@volar/typescript': 2.4.28
-      compare-versions: 6.1.1
-      debug: 4.4.3
-      glob-to-regexp: 0.4.1
-      kolorist: 1.8.0
-      local-pkg: 1.2.1
-      magic-string: 0.30.21
-      typescript: 6.0.3
-      unplugin: 2.3.11
-    optionalDependencies:
-      rolldown: 1.2.7
-      vite: 8.2.2(@types/node@22.20.1)
-    transitivePeerDependencies:
-      - supports-color
-
   unplugin-dts@1.1.0(rolldown@1.2.7)(typescript@7.0.2)(vite@8.2.2(@types/node@22.20.1)):
     dependencies:
       '@rollup/pluginutils': 5.4.0
@@ -1833,23 +1746,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  unplugin-dts@1.1.0(typescript@6.0.3)(vite@8.2.2(@types/node@22.20.1)):
-    dependencies:
-      '@rollup/pluginutils': 5.4.0
-      '@volar/typescript': 2.4.28
-      compare-versions: 6.1.1
-      debug: 4.4.3
-      glob-to-regexp: 0.4.1
-      kolorist: 1.8.0
-      local-pkg: 1.2.1
-      magic-string: 0.30.21
-      typescript: 6.0.3
-      unplugin: 2.3.11
-    optionalDependencies:
-      vite: 8.2.2(@types/node@22.20.1)
-    transitivePeerDependencies:
-      - supports-color
-
   unplugin@2.3.11:
     dependencies:
       '@jridgewell/remapping': 2.3.5
@@ -1857,37 +1753,9 @@ snapshots:
       picomatch: 4.0.7
       webpack-virtual-modules: 0.6.2
 
-  vite-plugin-dts@5.1.0(rolldown@1.2.7)(typescript@6.0.3)(vite@8.2.2(@types/node@22.20.1)):
-    dependencies:
-      unplugin-dts: 1.1.0(rolldown@1.2.7)(typescript@6.0.3)(vite@8.2.2(@types/node@22.20.1))
-    optionalDependencies:
-      vite: 8.2.2(@types/node@22.20.1)
-    transitivePeerDependencies:
-      - '@rspack/core'
-      - '@vue/language-core'
-      - esbuild
-      - rolldown
-      - supports-color
-      - typescript
-      - webpack
-
   vite-plugin-dts@5.1.0(rolldown@1.2.7)(typescript@7.0.2)(vite@8.2.2(@types/node@22.20.1)):
     dependencies:
       unplugin-dts: 1.1.0(rolldown@1.2.7)(typescript@7.0.2)(vite@8.2.2(@types/node@22.20.1))
-    optionalDependencies:
-      vite: 8.2.2(@types/node@22.20.1)
-    transitivePeerDependencies:
-      - '@rspack/core'
-      - '@vue/language-core'
-      - esbuild
-      - rolldown
-      - supports-color
-      - typescript
-      - webpack
-
-  vite-plugin-dts@5.1.0(typescript@6.0.3)(vite@8.2.2(@types/node@22.20.1)):
-    dependencies:
-      unplugin-dts: 1.1.0(typescript@6.0.3)(vite@8.2.2(@types/node@22.20.1))
     optionalDependencies:
       vite: 8.2.2(@types/node@22.20.1)
     transitivePeerDependencies:

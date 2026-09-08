@@ -17,7 +17,7 @@
     "./demo/*"
   ],
   "scripts": {
-    "build:all": "pnpm --filter bim-ecs... build && pnpm --filter @bim-ecs/grouped-component-plugin... build",
+    "build:all": "pnpm --filter bim-ecs... build && pnpm --filter @bim-ecs-grouped-component-plugin... build",
     "start:demo-arkanoid": "pnpm --filter @bim-ecs/ecs-arkanoid... build && pnpm --filter @bim-ecs/ecs-arkanoid... start",
     "sync-packages-versions": "node ./cli/versions/sync-package-versions.js",
     "prepublish": "node ./cli/readme/copy-readme.js"

@@ -1,9 +1,11 @@
 {
-  "name": "bim-ecs",
+  "name": "@state-of-geneva/bim-ecs",
   "author": "Etat de Genève",
   "description": "Typescript ECS library implementation",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org "
+    "registry": "https://registry.npmjs.org",
+    "dependencies": {
+    }
   },
   "keywords": [
     "ECS",
@@ -35,13 +37,12 @@
     "@types/jsdom": "^28.0.3",
     "@types/node": "catalog:",
     "jsdom": "^28.1.0",
-    "glob": "^13.0.6"
-  },
-  "dependencies": {
-    "@bim-ecs/iterable": "0.0.11",
-    "@bim-ecs/tuple-collections": "0.0.11",
-    "vite": "catalog:",
+    "glob": "^13.0.6",
     "vite-plugin-dts": "catalog:",
     "typescript": "catalog:"
+  },
+  "dependencies": {
+    "@bim-ecs/iterable": "workspace:*",
+    "@bim-ecs/tuple-collections": "workspace:*"
   }
 }

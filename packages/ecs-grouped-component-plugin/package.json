@@ -1,5 +1,5 @@
 {
-  "name": "@bim-ecs/grouped-component-plugin",
+  "name": "@state-of-geneva/bim-ecs-grouped-component-plugin",
   "author": "Etat de Genève",
   "description": "bim-ecs plugin for grouped components",
   "publishConfig": {
@@ -31,7 +31,7 @@
     "test:browser": "vitest --browser"
   },
   "dependencies": {
-    "@bim-ecs/iterable": "0.0.11"
+    "@bim-ecs/iterable": "workspace:*"
   },
   "devDependencies": {
     "@types/jsdom": "^21.1.7",
@@ -43,6 +43,6 @@
     "typescript": "catalog:"
   },
   "peerDependencies": {
-    "bim-ecs": "0.0.11"
+    "@state-of-geneva/bim-ecs": "workspace:*"
   }
 }

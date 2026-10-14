@@ -101,14 +101,13 @@ importers:
         version: 5.0.0(@types/node@22.20.1)(jsdom@29.1.1)(vite@8.2.2(@types/node@22.20.1))
 
   packages/ecs:
-    dependencies:
+    devDependencies:
       '@bim-ecs/iterable':
         specifier: workspace:*
         version: link:../../libs/iterable
       '@bim-ecs/tuple-collections':
         specifier: workspace:*
         version: link:../../libs/tuple-collections
-    devDependencies:
       '@types/jsdom':
         specifier: ^28.0.3
         version: 28.0.3
@@ -213,13 +212,13 @@ importers:
 
   packages/ecs-grouped-component-plugin:
     dependencies:
-      '@bim-ecs/iterable':
-        specifier: workspace:*
-        version: link:../../libs/iterable
       '@state-of-geneva/bim-ecs':
         specifier: workspace:*
         version: link:../ecs
     devDependencies:
+      '@bim-ecs/iterable':
+        specifier: workspace:*
+        version: link:../../libs/iterable
       '@types/jsdom':
         specifier: ^21.1.7
         version: 21.1.7

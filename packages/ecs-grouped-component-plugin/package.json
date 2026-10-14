@@ -30,10 +30,8 @@
     "test": "vitest",
     "test:browser": "vitest --browser"
   },
-  "dependencies": {
-    "@bim-ecs/iterable": "workspace:*"
-  },
   "devDependencies": {
+    "@bim-ecs/iterable": "workspace:*",
     "@types/jsdom": "^21.1.7",
     "@types/node": "catalog:",
     "jsdom": "^29.1.1",

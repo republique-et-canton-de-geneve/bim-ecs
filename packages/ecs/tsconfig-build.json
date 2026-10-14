@@ -1,4 +1,8 @@
 {
   "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Members tagged `@internal` are left out of the emitted .d.ts (they would expose types of the embedded libs)
+    "stripInternal": true
+  },
   "exclude": ["**/*.spec.ts"]
 }

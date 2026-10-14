@@ -8,6 +8,7 @@ import { ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED } from '../../comp
 /** Handles indexed components value caching */
 export class IndexedComponentsCache implements Disposable {
   #disposals = [] as Function[];
+  /** @internal Stripped from the .d.ts: its `TupleMap` type comes from an embedded (non-published) lib */
   public readonly entitiesByComponentValues = new TupleMap<[typeof EcsIndexedComponent<any>, any], Set<EntityId>>();
 
   constructor(world: Pick<EcsWorld, 'bus'>) {

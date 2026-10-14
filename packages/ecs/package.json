@@ -4,8 +4,7 @@
   "description": "Typescript ECS library implementation",
   "publishConfig": {
     "registry": "https://registry.npmjs.org",
-    "dependencies": {
-    }
+    "access": "public"
   },
   "keywords": [
     "ECS",
@@ -33,6 +32,8 @@
     "test:browser": "vitest --browser"
   },
   "devDependencies": {
+    "@bim-ecs/iterable": "workspace:*",
+    "@bim-ecs/tuple-collections": "workspace:*",
     "vite": "catalog:",
     "@types/jsdom": "^28.0.3",
     "@types/node": "catalog:",
@@ -40,9 +41,5 @@
     "glob": "^13.0.6",
     "vite-plugin-dts": "catalog:",
     "typescript": "catalog:"
-  },
-  "dependencies": {
-    "@bim-ecs/iterable": "workspace:*",
-    "@bim-ecs/tuple-collections": "workspace:*"
   }
 }

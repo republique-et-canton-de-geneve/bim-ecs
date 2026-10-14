@@ -15,16 +15,7 @@ export default defineConfig({
     },
     outDir: 'dist',
     rollupOptions: {
-      external: [
-        'bim-ecs',
-        'bim-ecs/components',
-        'bim-ecs/scheduling',
-        'bim-ecs/scheduling/modifiers',
-        'bim-ecs/entities',
-        'bim-ecs/systems',
-        'bim-ecs/resources',
-        'bim-ecs/event-bus',
-      ],
+      external: ['@state-of-geneva/bim-ecs'],
     },
     // rollupOptions: {
     //   external: ['bim-ecs'],

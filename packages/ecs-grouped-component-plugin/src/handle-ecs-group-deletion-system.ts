@@ -1,4 +1,4 @@
-import { defineSystem, on, ECS_COMPONENT_LINK_REMOVED } from 'bim-ecs';
+import { defineSystem, on, ECS_COMPONENT_LINK_REMOVED } from '@state-of-geneva/bim-ecs';
 import { ECS_GROUP_COMPONENT, type EcsGroupedComponent } from './ecs-grouped-component';
 
 export const handleEcsGroupDeletionsSystem = defineSystem(

@@ -3,10 +3,10 @@
 (From Wikipedia) Entity–component–system (ECS) is a software architectural pattern mostly used in video game development for the representation of game world objects. An ECS comprises entities composed from components of data, with systems which operate on the components.
 
 ## Quick start
-`npm i bim-ecs@latest`
+`npm i @state-of-geneva/bim-ecs@latest`
 
 ```typescript
-import { defineSystem, EcsComponent, EcsEvent, EcsWorld, startup } from 'bim-ecs';
+import { defineSystem, EcsComponent, EcsEvent, EcsWorld, startup } from '@state-of-geneva/bim-ecs';
 
 // Components
 class NameComponent extends EcsComponent<string> {}
@@ -583,7 +583,7 @@ If for some reason this is not possible (example: Some components could contain 
 an initialization session can be open to reduce entity mutation overhead:
 
 ```typescript
-import { EcsWorld } from 'bim-ecs';
+import { EcsWorld } from '@state-of-geneva/bim-ecs';
 
 const world = new EcsWorld()
 

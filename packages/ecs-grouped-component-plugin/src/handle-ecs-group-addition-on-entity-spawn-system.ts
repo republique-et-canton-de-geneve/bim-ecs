@@ -1,4 +1,4 @@
-import { defineSystem, ECS_ENTITY_SPAWNED, on } from 'bim-ecs';
+import { defineSystem, ECS_ENTITY_SPAWNED, on } from '@state-of-geneva/bim-ecs';
 import { ECS_GROUP_COMPONENT, type EcsGroupedComponent } from './ecs-grouped-component';
 import { map } from '@bim-ecs/iterable';
 import type { EcsGroupComponent } from './ecs-group-component';

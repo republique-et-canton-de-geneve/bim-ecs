@@ -1,4 +1,4 @@
-import type { EcsPlugin } from 'bim-ecs';
+import type { EcsPlugin } from '@state-of-geneva/bim-ecs';
 import { handleEcsGroupDeletionsSystem } from './handle-ecs-group-deletion-system';
 import { handleEcsGroupAdditionsSystem } from './handle-ecs-group-addition-system';
 import { handleEcsGroupAdditionOnEntitySpawnSystem } from './handle-ecs-group-addition-on-entity-spawn-system';

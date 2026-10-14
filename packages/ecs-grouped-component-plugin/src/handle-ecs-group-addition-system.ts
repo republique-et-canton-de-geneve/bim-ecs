@@ -1,4 +1,4 @@
-import { defineSystem, on, ECS_COMPONENT_LINK_ADDED } from 'bim-ecs';
+import { defineSystem, on, ECS_COMPONENT_LINK_ADDED } from '@state-of-geneva/bim-ecs';
 import { ECS_GROUP_COMPONENT, type EcsGroupedComponent } from './ecs-grouped-component';
 
 export const handleEcsGroupAdditionsSystem = defineSystem(

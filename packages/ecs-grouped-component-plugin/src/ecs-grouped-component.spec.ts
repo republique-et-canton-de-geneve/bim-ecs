@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { EcsWorld } from 'bim-ecs';
-import { EcsComponent } from 'bim-ecs/components';
+import { EcsComponent, EcsWorld } from '@state-of-geneva/bim-ecs';
 import { EcsGroupComponent } from './ecs-group-component';
 import { ECS_GROUP_COMPONENT, type EcsGroupedComponent } from './ecs-grouped-component';
 import { ecsGroupedComponentPlugin } from './ecs-grouped-component-plugin';

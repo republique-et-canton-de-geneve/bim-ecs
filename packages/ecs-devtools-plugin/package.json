@@ -1,0 +1,46 @@
+{
+  "name": "@state-of-geneva/bim-ecs-devtools-plugin",
+  "author": "Etat de Genève",
+  "description": "bim-ecs plugin exposing systems, components and resources introspection to devtools",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  },
+  "keywords": [
+    "ECS",
+    "Game engine",
+    "typescript",
+    "javascript",
+    "BIM",
+    "devtools"
+  ],
+  "private": false,
+  "version": "0.0.11",
+  "type": "module",
+  "license": "Apache-2.0",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.es.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.es.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig-build.json && vite build",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "catalog:",
+    "jsdom": "^29.1.1",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plugin-dts": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@state-of-geneva/bim-ecs": "workspace:*"
+  }
+}

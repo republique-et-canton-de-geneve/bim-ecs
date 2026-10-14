@@ -1,6 +1,6 @@
 import type { SchedulerCtor } from './scheduler-constructor';
 import { Scheduler } from './scheduler';
-import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../debug';
+import type { SchedulerDescriptor } from './scheduler-descriptor';
 import { type EcsComponentCtor, EcsMutableComponent } from '../components';
 import { ECS_MUTABLE_COMPONENT_VALUE_CHANGED } from '../components/ecs-component-events';
 import type { EntityId } from '../entities';
@@ -18,10 +18,12 @@ export function componentValueChanged<TValue, TComponent extends EcsMutableCompo
   componentType: EcsComponentCtor<TComponent, TValue>,
   query?: QueryDefinition,
 ): SchedulerCtor<{ component: TComponent; entities: Iterable<EntityId>; oldValue: TValue; newValue: TValue }> {
-  return class
-    extends Scheduler<{ component: TComponent; entities: Iterable<EntityId>; oldValue: TValue; newValue: TValue }>
-    implements Debuggable
-  {
+  return class extends Scheduler<{
+    component: TComponent;
+    entities: Iterable<EntityId>;
+    oldValue: TValue;
+    newValue: TValue;
+  }> {
     #resolveNext:
       | ((value: { component: TComponent; entities: Iterable<EntityId>; oldValue: TValue; newValue: TValue }) => void)
       | null = null;
@@ -33,6 +35,11 @@ export function componentValueChanged<TValue, TComponent extends EcsMutableCompo
       oldValue: TValue;
       newValue: TValue;
     }[] = [];
+
+    /** @inheritdoc */
+    public describe(): SchedulerDescriptor {
+      return { kind: 'component-value-changed', labels: [componentType.name] };
+    }
 
     /** @inheritdoc */
     public run(
@@ -77,17 +84,6 @@ export function componentValueChanged<TValue, TComponent extends EcsMutableCompo
     }
 
     #unsubscribe: Function | undefined = undefined;
-
-    get [DEBUG_NAME]() {
-      return componentType.name ?? '#no name';
-    }
-    readonly [DEBUG_TYPE] = '♟+';
-    get [DEBUG_ID]() {
-      return `onComponentAdded_${componentType.name}`;
-    }
-    get [DEBUG_DEPENDENCIES]() {
-      return [];
-    }
 
     /** @inheritdoc */
     [Symbol.dispose]() {

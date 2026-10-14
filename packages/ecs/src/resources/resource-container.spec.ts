@@ -80,4 +80,31 @@ describe('ResourceContainer', () => {
     const key = Symbol() as EcsResourceKey<{ foo: string }>;
     expect(() => container.resolve(key)).toThrow();
   });
+
+  describe('list', () => {
+    it('should list resources with a readable name whatever the kind of key is', () => {
+      class MyResource extends EcsResource {
+        foo = 'bar';
+      }
+
+      const container = new ResourceContainer({} as EcsWorld);
+      container.resolve(MyResource);
+      container.register(Symbol('MY_VALUE') as EcsResourceKey<number>, 5);
+
+      expect(container.list()).toEqual([
+        { name: 'MyResource', resource: expect.any(MyResource) },
+        { name: 'MY_VALUE', resource: 5 },
+      ]);
+    });
+
+    it('should list a resource registered by instance once', () => {
+      class MyResource extends EcsResource {}
+
+      const container = new ResourceContainer({} as EcsWorld);
+      const instance = new MyResource();
+      container.register(instance);
+
+      expect(container.list()).toEqual([{ name: 'MyResource', resource: instance }]);
+    });
+  });
 });

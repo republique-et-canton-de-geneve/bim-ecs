@@ -1,8 +1,6 @@
 import type { SchedulerCtor } from '../scheduler-constructor';
 import { Scheduler } from '../scheduler';
-import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE } from '../../debug';
-
-let i = 0;
+import type { SchedulerDescriptor } from '../scheduler-descriptor';
 
 /**
  * Debounce scheduler items
@@ -11,22 +9,15 @@ let i = 0;
  */
 export function debounce<T>(schedulersConstructor: SchedulerCtor<T>, delay: number): SchedulerCtor<T> {
   return class extends Scheduler<T> {
-    #_internalId = i++;
     #debounceTimer: ReturnType<typeof setTimeout> | null = null;
     #lastPayload: T | undefined = undefined;
     #isDisposed = false;
 
     readonly #scheduler: Scheduler<T> = new schedulersConstructor(this.world, this);
 
-    get [DEBUG_NAME]() {
-      return `debounce ${delay}ms`;
-    }
-    readonly [DEBUG_TYPE] = '🎚';
-    get [DEBUG_ID]() {
-      return `debounce_${delay}_${this.#_internalId}`;
-    }
-    get [DEBUG_DEPENDENCIES]() {
-      return [this.#scheduler];
+    /** @inheritdoc */
+    public describe(): SchedulerDescriptor {
+      return { kind: 'debounce', params: { delay }, children: [this.#scheduler.describe()] };
     }
 
     /** @inheritdoc */

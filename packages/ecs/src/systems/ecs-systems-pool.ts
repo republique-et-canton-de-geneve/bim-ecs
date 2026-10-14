@@ -3,6 +3,8 @@ import { EcsWorld } from '../world';
 import type { SystemDefinition } from './system-definition';
 import type { EcsCommand } from './commands';
 import { ECS_COMMAND_EVENT } from './commands/command-events';
+import { ECS_SYSTEM_REGISTERED_EVENT } from './system-events';
+import type { SystemDescriptor } from './system-descriptor';
 
 /** Handles system pool running state */
 export class EcsSystemsPool implements Disposable {
@@ -11,6 +13,11 @@ export class EcsSystemsPool implements Disposable {
   /** Determines whether the systems are running */
   get isRunning() {
     return this.#isRunning;
+  }
+
+  /** The number of registered systems */
+  get size() {
+    return this.#systems.size;
   }
 
   constructor(private readonly world: EcsWorld) {}
@@ -24,6 +31,12 @@ export class EcsSystemsPool implements Disposable {
   public registerSystem(systemDefinition: SystemDefinition<any>) {
     const definition = systemDefinition(this.world);
     this.#systems.set(definition.id, definition);
+    this.world.bus.publish(ECS_SYSTEM_REGISTERED_EVENT, { id: definition.id, time: Date.now() });
+  }
+
+  /** Describes the registered systems for introspection purposes (cold path, never called while processing) */
+  public describe(): SystemDescriptor[] {
+    return Array.from(this.#systems.values(), (system) => system.describe());
   }
 
   /**

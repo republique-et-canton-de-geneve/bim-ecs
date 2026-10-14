@@ -17,7 +17,6 @@ import { ECS_WORLD_DISPOSING_EVENT, ECS_WORLD_RUNNING_EVENT, ECS_WORLD_STOPPING_
 import { EcsResource } from '../resources';
 import { ECS_ENTITY_SPAWNED, EntityPool } from '../entities';
 import type { EcsPlugin } from './ecs-plugin';
-import { DebugTracker } from '../debug/debug-tracker';
 import { QueryEngine } from '../querying';
 import { EntitiesFacade } from '../entities/entities-facade';
 import { InitSession } from './init-session';
@@ -49,9 +48,6 @@ export class EcsWorld implements Disposable {
 
   /** Entities facade */
   public readonly entities = new EntitiesFacade(this.entityPool, this.queryEngine);
-
-  /** Debug tracker */
-  public readonly debug = new DebugTracker(this);
 
   constructor(resources?: EcsResource[], options?: { verbose?: 'info' | 'debug' | true }) {
     if (options?.verbose) this.verbose(options?.verbose);

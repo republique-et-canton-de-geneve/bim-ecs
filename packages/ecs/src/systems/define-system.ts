@@ -34,11 +34,7 @@ export function defineSystem<TPayload, TReturnType>(
   const id = idCounter++
 
   return Object.assign(
-    (world: EcsWorld) => {
-      const runner = new SystemRunner(name, id, { system, scheduler, world }, options)
-      world.debug.track(runner)
-      return runner
-    },
+    (world: EcsWorld) => new SystemRunner(name, id, { system, scheduler, world }, options),
     {
       [SYSTEM_DEFINITION_ID_KEY]: id,
       [SYSTEM_DEFINITION_OPTIONS_KEY]: options,

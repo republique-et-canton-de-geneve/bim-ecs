@@ -4,6 +4,7 @@ export * from './timer';
 export * from './after';
 export * from './on';
 export * from './scheduler';
+export type { SchedulerDescriptor } from './scheduler-descriptor';
 export * from './at-command';
 export * from './entity-spawned';
 export * from './entity-removed';

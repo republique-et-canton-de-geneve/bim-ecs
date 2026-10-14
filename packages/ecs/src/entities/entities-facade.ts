@@ -2,6 +2,7 @@ import { EntityPool } from './entity-pool';
 import { QueryEngine } from '../querying';
 import { type EcsComponent, type EcsComponentCtor } from '../components';
 import type { EntityId } from './entity-id';
+import type { EntityArchetype } from './entity-archetype';
 import type { QueryDefinition } from '../querying/query-definition';
 
 export class EntitiesFacade implements Partial<EntityPool> {
@@ -41,6 +42,29 @@ export class EntitiesFacade implements Partial<EntityPool> {
   /** @inheritDoc */
   public removeComponent(entity: EntityId, ...types: (typeof EcsComponent<any>)[]) {
     return this.pool.removeComponent(entity, ...types);
+  }
+
+  /**
+   * Describes the entities archetypes for introspection purposes (cold path, never called while processing).
+   * The cost is proportional to the number of archetypes, not to the number of entities.
+   */
+  public archetypes(): EntityArchetype[] {
+    const archetypes: EntityArchetype[] = [];
+
+    for (const entities of this.querying.archetypeCache.entitiesByArchetypeMask.values()) {
+      // Archetypes are not removed once emptied: a representative entity is the way to detect them
+      const representative = entities.values().next();
+      if (representative.done) continue;
+
+      const components = new Set<typeof EcsComponent<any>>();
+      for (const component of this.pool.componentsByEntity.get(representative.value) ?? []) {
+        components.add(component.constructor as typeof EcsComponent<any>);
+      }
+
+      archetypes.push({ components: [...components], entities });
+    }
+
+    return archetypes;
   }
 
   /**

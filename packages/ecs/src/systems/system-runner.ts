@@ -13,10 +13,11 @@ import type { EcsEvent } from '../event-bus';
 import { createMixinRunner } from './system-mixin-runner';
 import type { SchedulerCtor, SchedulerCtorSystemHost } from '../scheduling/scheduler-constructor';
 import type { ExtractEcsEventType } from '../event-bus/extract-ecs-event-type';
-import { DEBUG_DEPENDENCIES, DEBUG_DEPENDENTS, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../debug';
+import { keyName } from '../scheduling/scheduler-descriptor';
+import type { SystemDescriptor } from './system-descriptor';
 import type { EcsCommand } from './commands';
 
-export class SystemRunner<TPayload, TReturnType = any> implements Disposable, Debuggable {
+export class SystemRunner<TPayload, TReturnType = any> implements Disposable {
   #running = false;
   #disposed = false;
   #schedulerDisposed = false;
@@ -29,56 +30,6 @@ export class SystemRunner<TPayload, TReturnType = any> implements Disposable, De
 
   // Scheduler disposal handling
   readonly #unsubscribeSchedulerDisposedEvent: () => void;
-
-  /** @inheritDoc */
-  get [DEBUG_NAME]() {
-    return this.name;
-  }
-
-  /** @inheritDoc */
-  get [DEBUG_ID]() {
-    return `system__${this.id}`;
-  }
-
-  /** @inheritDoc */
-  readonly [DEBUG_TYPE] = '🚀';
-
-  /** @inheritDoc */
-  get [DEBUG_DEPENDENCIES]() {
-    return [this.#scheduler];
-  }
-
-  /** @inheritDoc */
-  get [DEBUG_DEPENDENTS]() {
-    const result: Debuggable[] = [];
-    if (this.options?.then?.publish) {
-      const event = this.options.then.publish;
-      result.push({
-        [DEBUG_NAME]: event.description!,
-        [DEBUG_DEPENDENCIES]: [],
-        [DEBUG_ID]: `on_${event.description}`,
-        [DEBUG_TYPE]: '⚡',
-      });
-    }
-
-    if (this.options?.then?.trigger) {
-      const command = this.options.then.trigger;
-      result.push({
-        [DEBUG_NAME]: command.description!,
-        [DEBUG_DEPENDENCIES]: [],
-        [DEBUG_ID]: `onCommand_${command.description}`,
-        [DEBUG_TYPE]: '🕹',
-      });
-
-      return result;
-    }
-
-    // return [
-    //   ...this.options?.then?.publish?.map((e: EcsEvent) => ({
-    //     [DEBUG_NAME]: (e as Symbol).description
-    //   })) ?? []
-    // ]
-  }
 
   /** User-friendly label */
   get label() {
@@ -118,6 +69,26 @@ export class SystemRunner<TPayload, TReturnType = any> implements Disposable, De
         this.#schedulerDisposed = true;
       }
     });
+  }
+
+  /** Describes the system for introspection purposes (cold path, never called while processing) */
+  public describe(): SystemDescriptor {
+    const descriptor: SystemDescriptor = {
+      id: this.id,
+      name: this.name,
+      running: this.#running,
+      disposed: this.#disposed,
+      scheduler: this.#scheduler.describe(),
+    };
+
+    const then = this.options?.then;
+    if (then?.publish || then?.trigger) {
+      descriptor.then = {};
+      if (then.publish) descriptor.then.publish = keyName(then.publish);
+      if (then.trigger) descriptor.then.trigger = keyName(then.trigger);
+    }
+
+    return descriptor;
   }
 
   /** Interrupts the running system */

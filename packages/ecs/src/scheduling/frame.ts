@@ -1,13 +1,11 @@
 import { Scheduler } from './scheduler';
-import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../debug';
+import type { SchedulerDescriptor } from './scheduler-descriptor';
 
 /** Schedules execution each frame */
-export class frame extends Scheduler<DOMHighResTimeStamp> implements Debuggable {
-  readonly [DEBUG_NAME] = 'frame';
-  readonly [DEBUG_TYPE] = '⚡';
-  readonly [DEBUG_ID] = 'frame';
-  get [DEBUG_DEPENDENCIES]() {
-    return [];
+export class frame extends Scheduler<DOMHighResTimeStamp> {
+  /** @inheritdoc */
+  public describe(): SchedulerDescriptor {
+    return { kind: 'frame' };
   }
 
   /** @inheritdoc */

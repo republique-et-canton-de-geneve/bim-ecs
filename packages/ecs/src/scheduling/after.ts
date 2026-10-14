@@ -8,7 +8,7 @@ import {
 import type { SystemDefinition, SystemDefinitionWithId } from '../systems/system-definition';
 import type { SchedulerCtor } from './scheduler-constructor';
 import type { ExtractSystemDefinitionPayloadType } from '../systems/extract-system-definition-payload-type';
-import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../debug';
+import type { SchedulerDescriptor } from './scheduler-descriptor';
 import { SYSTEM_DEFINITION_ID_KEY } from '../systems/define-system';
 
 export function after<TPayload>(systemDefinition: SystemDefinition<any, TPayload>): SchedulerCtor<TPayload>;
@@ -27,7 +27,7 @@ export function after<TPayload>(
   systemDefinition: SystemDefinition<any, TPayload> | SystemDefinition<any, TPayload>[],
   options?: { combination?: 'and' | 'or' },
 ): SchedulerCtor<TPayload> {
-  return class extends Scheduler<TPayload> implements Debuggable {
+  return class extends Scheduler<TPayload> {
     #systemDefinitions = Array.isArray(systemDefinition) ? systemDefinition : [systemDefinition];
     #systemDefinitionsStarted = new Set<SystemDefinition<any, any>>();
 
@@ -96,15 +96,15 @@ export function after<TPayload>(
       });
     }
 
-    readonly [DEBUG_NAME] = Array.isArray(systemDefinition) ? `after (${options?.combination ?? 'or'})` : 'after';
-    readonly [DEBUG_TYPE] = '⏱';
-    get [DEBUG_ID]() {
-      return `after_${((Array.isArray(systemDefinition) ? systemDefinition : [systemDefinition]) as any[]).map((sysdef) => sysdef[SYSTEM_DEFINITION_ID_KEY]).join('_')}`;
-    }
-    get [DEBUG_DEPENDENCIES]() {
-      return (Array.isArray(systemDefinition) ? systemDefinition : [systemDefinition]).map((systemDefinition) =>
-        this.world.systems.get((systemDefinition as any)[SYSTEM_DEFINITION_ID_KEY]),
-      );
+    /** @inheritdoc */
+    public describe(): SchedulerDescriptor {
+      return {
+        kind: 'after',
+        systems: this.#systemDefinitions.map(
+          (systemDefinition) => (systemDefinition as SystemDefinitionWithId<TPayload>)[SYSTEM_DEFINITION_ID_KEY],
+        ),
+        params: { combination: options?.combination ?? 'or' },
+      };
     }
 
     /** @inheritdoc */

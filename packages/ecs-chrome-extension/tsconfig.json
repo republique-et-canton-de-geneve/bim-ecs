@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "lib": ["ES2023", "ESNext.Disposable", "DOM", "DOM.Iterable"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "Bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "verbatimModuleSyntax": true,
+    "noUncheckedSideEffectImports": false,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "types": ["chrome", "vite/client", "node"],
+
+    /* Linting (same level as the workspace packages, whose sources are also type checked here) */
+    "strict": true,
+
+    /*
+     * Workspace sources, so the panel, the harness and the tests never depend on the build order of the other packages.
+     * Keep in sync with `resolve.alias` of vite.config.ts.
+     */
+    "paths": {
+      "@bim-ecs/devtools-protocol": ["../ecs-devtools-plugin/src/protocol.ts"],
+      "@state-of-geneva/bim-ecs-devtools-plugin": ["../ecs-devtools-plugin/src/index.ts"],
+      "@state-of-geneva/bim-ecs": ["../ecs/src/index.ts"],
+      "@bim-ecs/iterable": ["../../libs/iterable/src/index.ts"],
+      "@bim-ecs/tuple-collections": ["../../libs/tuple-collections/src/index.ts"]
+    }
+  },
+  "include": ["src", "manifest.ts", "vite.config.ts"]
+}

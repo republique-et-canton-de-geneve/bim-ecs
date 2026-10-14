@@ -65,6 +65,22 @@ export class ResourceContainer implements Disposable {
     return [...this.#refs.entries()].map(([key, value]) => [key.name, value])
   }
 
+  /**
+   * Lists the registered resources with a readable name, for introspection purposes (cold path).
+   * Resources only registered by instance are listed once, from their type.
+   */
+  public list() {
+    const resources: { name: string; resource: unknown }[] = []
+    for (const [key, resource] of this.#refs) {
+      if (resource === undefined) continue // Key of an instance registration, the value is bound to its type
+
+      const name = typeof key === 'function' ? key.name : (key as symbol).description
+      resources.push({ name: name || '#no name', resource })
+    }
+
+    return resources
+  }
+
   /** @inheritdoc */
   [Symbol.dispose]() {
     this.#refs.clear()

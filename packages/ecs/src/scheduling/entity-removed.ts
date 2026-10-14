@@ -1,6 +1,6 @@
 import type { SchedulerCtor } from './scheduler-constructor';
 import { Scheduler } from './scheduler';
-import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../debug';
+import { describeQuery, type SchedulerDescriptor } from './scheduler-descriptor';
 import { EcsComponent } from '../components';
 import type { EntityId } from '../entities';
 import { ECS_ENTITY_REMOVED } from '../entities/entities-events';
@@ -10,8 +10,6 @@ import { map } from '@bim-ecs/iterable';
 import type { Archetype } from '../querying/_archetype';
 import { runAtomicQueryOnSingleEntity } from '../querying/query-processing';
 
-let idCounter = 0;
-
 /**
  * Schedules execution on specified entity removed from world
  * @param query The filter query
@@ -19,9 +17,13 @@ let idCounter = 0;
 export function entityRemoved(
   query: QueryDefinition,
 ): SchedulerCtor<{ entity: EntityId; components: Iterable<EcsComponent<any>> }> {
-  return class extends Scheduler<{ entity: EntityId; components: Iterable<EcsComponent<any>> }> implements Debuggable {
+  return class extends Scheduler<{ entity: EntityId; components: Iterable<EcsComponent<any>> }> {
     readonly #queryClr = this.world.entities.querying.compile(query);
-    readonly #id = idCounter++;
+
+    /** @inheritdoc */
+    public describe(): SchedulerDescriptor {
+      return describeQuery('entity-removed', this.#queryClr);
+    }
 
     /** @inheritdoc */
     public run(next: (payload: { entity: EntityId; components: Iterable<EcsComponent<any>> }) => void) {
@@ -49,17 +51,6 @@ export function entityRemoved(
     }
 
     #unsubscribe: Function | undefined = undefined;
-
-    get [DEBUG_NAME]() {
-      return query.name ?? '#no name';
-    }
-    readonly [DEBUG_TYPE] = '-';
-    get [DEBUG_ID]() {
-      return `onEntityRemoved_${this.#id}`;
-    }
-    get [DEBUG_DEPENDENCIES]() {
-      return [];
-    }
 
     /** @inheritdoc */
     [Symbol.dispose]() {

@@ -1,7 +1,7 @@
 import type { SchedulerCtor } from '../scheduler-constructor';
 import { Scheduler } from '../scheduler';
 import { EcsWorld } from '../../world';
-import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../../debug';
+import type { SchedulerDescriptor } from '../scheduler-descriptor';
 
 /**
  * Conditional scheduler modifier
@@ -12,18 +12,16 @@ export function when<T>(
   predicateFactory: (world: EcsWorld) => (data: { payload: T }) => boolean,
   schedulersConstructor: SchedulerCtor<T>,
 ): SchedulerCtor<T> {
-  return class WhenScheduler extends Scheduler<T> implements Debuggable {
+  return class WhenScheduler extends Scheduler<T> {
     readonly #scheduler: Scheduler<T> = new schedulersConstructor(this.world, this);
 
-    get [DEBUG_NAME]() {
-      return `when "${predicateFactory.name ?? '#unknown condition'}"`;
-    }
-    readonly [DEBUG_TYPE] = '❔';
-    get [DEBUG_ID]() {
-      return `when_${predicateFactory.name ?? new Date().getTime()}`;
-    }
-    get [DEBUG_DEPENDENCIES]() {
-      return [this.#scheduler];
+    /** @inheritdoc */
+    public describe(): SchedulerDescriptor {
+      return {
+        kind: 'when',
+        params: { predicate: predicateFactory.name || '#anonymous condition' },
+        children: [this.#scheduler.describe()],
+      };
     }
 
     /** @inheritdoc */

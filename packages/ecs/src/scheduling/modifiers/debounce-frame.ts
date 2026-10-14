@@ -1,26 +1,18 @@
 import type { SchedulerCtor } from '../scheduler-constructor';
 import { Scheduler } from '../scheduler';
-import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE } from '../../debug';
+import type { SchedulerDescriptor } from '../scheduler-descriptor';
 
-let i = 0;
 export function debounceFrame<T>(schedulersConstructor: SchedulerCtor<T>): SchedulerCtor<T> {
   return class extends Scheduler<T> {
-    #_internalId = i++;
     #frameRequestId: number | null = null;
     #lastPayload: T | undefined = undefined;
     #isDisposed = false;
 
     readonly #scheduler: Scheduler<T> = new schedulersConstructor(this.world, this);
 
-    get [DEBUG_NAME]() {
-      return `debounceFrame`;
-    }
-    readonly [DEBUG_TYPE] = '🎥';
-    get [DEBUG_ID]() {
-      return `debounceFrame_${this.#_internalId}`;
-    }
-    get [DEBUG_DEPENDENCIES]() {
-      return [this.#scheduler];
+    /** @inheritdoc */
+    public describe(): SchedulerDescriptor {
+      return { kind: 'debounce-frame', children: [this.#scheduler.describe()] };
     }
 
     /** @inheritdoc */

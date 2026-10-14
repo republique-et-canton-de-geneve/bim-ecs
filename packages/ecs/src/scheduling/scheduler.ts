@@ -1,6 +1,7 @@
 import type { EcsWorld } from '../world';
 import { SCHEDULER_DISPOSED_EVENT } from './scheduler-events';
 import type { SchedulerCtorHost } from './scheduler-constructor';
+import type { SchedulerDescriptor } from './scheduler-descriptor';
 
 /** Base class for scheduler */
 export abstract class Scheduler<TPayload> implements Disposable {
@@ -36,4 +37,13 @@ export abstract class Scheduler<TPayload> implements Disposable {
    * @param dispose Dispose trigger
    */
   public abstract run(next: (payload: TPayload) => unknown, dispose: () => void): void;
+
+  /**
+   * Describes the scheduler for introspection purposes (cold path, never called while processing).
+   * Schedulers are expected to override it, the default keeps custom schedulers visible.
+   */
+  public describe(): SchedulerDescriptor {
+    const name = this.constructor.name;
+    return name ? { kind: 'custom', labels: [name] } : { kind: 'custom' };
+  }
 }

@@ -1,4 +1,5 @@
 import { EcsWorld } from 'bim-ecs';
+import { devtoolsPlugin } from '@state-of-geneva/bim-ecs-devtools-plugin';
 import { eventsHandlingPlugin } from './inputs-binding';
 import { renderingPlugin } from './rendering';
 import { bricksPlugin } from './brick';
@@ -17,5 +18,5 @@ world.use(eventsHandlingPlugin);
 world.use(disablingPlugin);
 world.use(scorePlugin);
 
-world.debug.render();
+world.use(devtoolsPlugin({ name: 'Arkanoid' }));
 world.run();

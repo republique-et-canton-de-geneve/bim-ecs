@@ -1,4 +1,5 @@
 import { Scheduler } from './scheduler';
+import type { SchedulerDescriptor } from './scheduler-descriptor';
 
 /** Constructs a Scheduler with the same signature as Scheduler itself */
 export type SchedulerConstructor<T> = new (...args: ConstructorParameters<typeof Scheduler<T>>) => Scheduler<T>;
@@ -10,6 +11,11 @@ export type SchedulerConstructor<T> = new (...args: ConstructorParameters<typeof
 export const timer = (delay: number): SchedulerConstructor<number> =>
   class extends Scheduler<number> {
     #timeoutId: number | undefined;
+
+    /** @inheritdoc */
+    describe(): SchedulerDescriptor {
+      return { kind: 'timer', params: { delay } };
+    }
 
     /** @inheritdoc */
     run(next: (payload: number) => void) {

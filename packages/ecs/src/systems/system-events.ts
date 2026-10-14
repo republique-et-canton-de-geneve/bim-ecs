@@ -1,6 +1,14 @@
 import type { EcsEvent } from '../event-bus';
 import type { SystemRunner } from './system-runner';
 
+/** Occurs when a system is registered to a world */
+export const ECS_SYSTEM_REGISTERED_EVENT = Symbol('SYSTEM_REGISTERED_EVENT') as EcsEvent<{
+  /** The system definition identifier */
+  id: SystemRunner<unknown>['id'];
+  /** The event timestamp */
+  time: ReturnType<(typeof Date)['now']>;
+}>;
+
 /** Occurs when a system is being invoked */
 export const ECS_SYSTEM_PROCESSING_EVENT = Symbol('SYSTEM_PROCESSING_EVENT') as EcsEvent<{
   /** The system definition identifier */

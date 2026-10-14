@@ -609,6 +609,18 @@ Some operations are not available during the session and should not be attempted
 - Querying
 - Entity deletion
 
+## Debugging
+
+The structure of a world (systems, how they are scheduled, components, entities, resources) can be inspected with the BIM ECS DevTools browser extension, through a plugin:
+
+```typescript
+import { devtoolsPlugin } from '@state-of-geneva/bim-ecs-devtools-plugin';
+
+world.use(devtoolsPlugin({ name: 'My game' }));
+```
+
+Nothing is computed until a tool asks for it, and the library knows nothing about how the data is displayed: the plugin publishes plain JSON on a global hook. See [the plugin](./packages/ecs-devtools-plugin) and [the extension](./packages/ecs-chrome-extension).
+
 ## How to contribute
 
 If your project match our needs, you may be interested in some additional features or improvements. As such, contribution is very welcome.  

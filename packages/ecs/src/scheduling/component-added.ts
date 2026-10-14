@@ -1,6 +1,6 @@
 import type { SchedulerCtor } from './scheduler-constructor';
 import { Scheduler } from './scheduler';
-import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../debug';
+import type { SchedulerDescriptor } from './scheduler-descriptor';
 import { EcsComponent, type EcsComponentCtor } from '../components';
 import { ECS_COMPONENT_LINK_ADDED } from '../components';
 import type { EntityId } from '../entities';
@@ -18,7 +18,12 @@ export function componentAdded<TValue, TComponent extends EcsComponent<TValue>>(
   componentType: EcsComponentCtor<TComponent, TValue>,
   query?: QueryDefinition,
 ): SchedulerCtor<{ component: TComponent; entity: EntityId }> {
-  return class extends Scheduler<{ component: TComponent; entity: EntityId }> implements Debuggable {
+  return class extends Scheduler<{ component: TComponent; entity: EntityId }> {
+    /** @inheritdoc */
+    public describe(): SchedulerDescriptor {
+      return { kind: 'component-added', labels: [componentType.name] };
+    }
+
     /** @inheritdoc */
     public run(next: (payload: { component: TComponent; entity: EntityId }) => void, dispose: () => void): void {
       this.#unsubscribe = this.world.bus.subscribe(ECS_COMPONENT_LINK_ADDED, (args) => {
@@ -52,17 +57,6 @@ export function componentAdded<TValue, TComponent extends EcsComponent<TValue>>(
     }
 
     #unsubscribe: Function | undefined = undefined;
-
-    get [DEBUG_NAME]() {
-      return componentType.name ?? '#no name';
-    }
-    readonly [DEBUG_TYPE] = '♟+';
-    get [DEBUG_ID]() {
-      return `onComponentAdded_${componentType.name}`;
-    }
-    get [DEBUG_DEPENDENCIES]() {
-      return [];
-    }
 
     /** @inheritdoc */
     [Symbol.dispose]() {

@@ -2,7 +2,7 @@ import { type EcsEvent } from '../event-bus';
 import { Scheduler } from './scheduler';
 import type { SchedulerCtor } from './scheduler-constructor';
 import type { ExtractEcsEventType } from '../event-bus/extract-ecs-event-type';
-import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../debug';
+import { keyName, type SchedulerDescriptor } from './scheduler-descriptor';
 
 export function on<TPayload>(eventKey: EcsEvent<TPayload>): SchedulerCtor<TPayload>;
 export function on<TEvent extends EcsEvent<any>[]>(
@@ -14,11 +14,11 @@ export function on<TEvent extends EcsEvent<any>[]>(
  * @param eventKey The Event on which execution is scheduled
  */
 export function on<TPayload>(eventKey: EcsEvent<TPayload> | EcsEvent<any>[]): SchedulerCtor<any> {
-  return class extends Scheduler<TPayload> implements Debuggable {
-    #resolveNext: ((value: TPayload) => void) | null = null;
-
-    /** Pending event payloads */
-    readonly #eventPayloadsQueue: TPayload[] = [];
+  return class extends Scheduler<TPayload> {
+    /** @inheritdoc */
+    public describe(): SchedulerDescriptor {
+      return { kind: 'on', labels: (Array.isArray(eventKey) ? eventKey : [eventKey]).map(keyName) };
+    }
 
     /** @inheritdoc */
     public run(next: (payload: TPayload) => void, dispose: () => void) {
@@ -28,21 +28,6 @@ export function on<TPayload>(eventKey: EcsEvent<TPayload> | EcsEvent<any>[]): Sc
     }
 
     #unsubscribe: Function[] | undefined = undefined;
-
-    get [DEBUG_NAME]() {
-      return Array.isArray(eventKey)
-        ? eventKey.map((e) => (e as Symbol).description ?? '#no name')
-        : ((eventKey as Symbol).description ?? '#no name');
-    }
-    readonly [DEBUG_TYPE] = '⚡';
-    get [DEBUG_ID]() {
-      return Array.isArray(eventKey)
-        ? eventKey.map((e) => `on_${(e as Symbol).description}`)
-        : `on_${(eventKey as Symbol).description}`;
-    }
-    get [DEBUG_DEPENDENCIES]() {
-      return [];
-    }
 
     /** @inheritdoc */
     [Symbol.dispose]() {

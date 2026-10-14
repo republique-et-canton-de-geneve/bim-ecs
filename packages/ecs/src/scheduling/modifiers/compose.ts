@@ -1,31 +1,21 @@
 import type { SchedulerCtor, SchedulerCtorHost } from '../scheduler-constructor';
 import type { EcsWorld } from '../../world';
 import { Scheduler } from '../scheduler';
-import { DEBUG_DEPENDENCIES, DEBUG_ID, DEBUG_NAME, DEBUG_TYPE, type Debuggable } from '../../debug';
-
-let i = 0;
+import type { SchedulerDescriptor } from '../scheduler-descriptor';
 
 /**
  * Creates a scheduler aggregation
  * @param schedulersConstructors Scheduler to aggregate
  */
 export function compose(...schedulersConstructors: ReadonlyArray<SchedulerCtor<any>>): SchedulerCtor<any> {
-  return class extends Scheduler<any> implements Debuggable {
-    #_internalId = i++;
-
+  return class extends Scheduler<any> {
     /** scheduler instances */
     #schedulers = schedulersConstructors.map((ctor) => new ctor(this.world, this));
     #disposedSchedulers = new Set<Scheduler<any>>();
 
-    get [DEBUG_NAME]() {
-      return `compose`;
-    }
-    readonly [DEBUG_TYPE] = '➕';
-    get [DEBUG_ID]() {
-      return `compose_${this.#_internalId}`;
-    }
-    get [DEBUG_DEPENDENCIES]() {
-      return [...this.#schedulers];
+    /** @inheritdoc */
+    public describe(): SchedulerDescriptor {
+      return { kind: 'compose', children: this.#schedulers.map((scheduler) => scheduler.describe()) };
     }
 
     constructor(world: EcsWorld, host: SchedulerCtorHost) {

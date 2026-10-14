@@ -12,6 +12,7 @@
   "author": "Etat de Genève",
   "license": "Apache-2.0",
   "dependencies": {
-    "@state-of-geneva/bim-ecs": "workspace:*"
+    "@state-of-geneva/bim-ecs": "workspace:*",
+    "@state-of-geneva/bim-ecs-devtools-plugin": "workspace:*"
   }
 }

@@ -1,4 +1,4 @@
-import { EcsResource } from 'bim-ecs';
+import { EcsResource } from '@state-of-geneva/bim-ecs';
 
 export class Config extends EcsResource {
   width = 600;

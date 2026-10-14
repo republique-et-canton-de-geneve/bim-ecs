@@ -1,4 +1,4 @@
-import { defineSystem, EcsPlugin, EcsComponent, frame, startup } from 'bim-ecs';
+import { defineSystem, EcsPlugin, EcsComponent, frame, startup } from '@state-of-geneva/bim-ecs';
 import { BoxGeometry } from './box-geometry';
 import { Config } from './config';
 import { Name } from './common';

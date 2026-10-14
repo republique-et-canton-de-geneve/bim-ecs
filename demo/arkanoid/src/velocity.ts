@@ -1,4 +1,4 @@
-import { EcsMutableComponent } from 'bim-ecs';
+import { EcsMutableComponent } from '@state-of-geneva/bim-ecs';
 import { BoxGeometry } from './box-geometry';
 
 export class Velocity extends EcsMutableComponent<{ x: number; y: number }> {

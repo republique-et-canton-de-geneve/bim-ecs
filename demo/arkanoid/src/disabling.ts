@@ -1,5 +1,5 @@
-import { EcsComponent, componentAdded } from 'bim-ecs';
-import { defineSystem, EcsPlugin } from 'bim-ecs';
+import { EcsComponent, componentAdded } from '@state-of-geneva/bim-ecs';
+import { defineSystem, EcsPlugin } from '@state-of-geneva/bim-ecs';
 import { DOMElementComponent } from './rendering';
 
 export const disablingPlugin: EcsPlugin = (world) => {

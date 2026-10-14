@@ -1,4 +1,4 @@
-import { EcsWorld } from 'bim-ecs';
+import { EcsWorld } from '@state-of-geneva/bim-ecs';
 import { devtoolsPlugin } from '@state-of-geneva/bim-ecs-devtools-plugin';
 import { eventsHandlingPlugin } from './inputs-binding';
 import { renderingPlugin } from './rendering';

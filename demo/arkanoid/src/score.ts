@@ -1,4 +1,4 @@
-import { defineSystem, EcsPlugin, EcsResource, componentAdded } from 'bim-ecs';
+import { defineSystem, EcsPlugin, EcsResource, componentAdded } from '@state-of-geneva/bim-ecs';
 import { Disabled } from './disabling';
 import { Brick } from './brick';
 

@@ -1,4 +1,4 @@
-import { EcsPlugin, defineSystem, after } from 'bim-ecs';
+import { EcsPlugin, defineSystem, after } from '@state-of-geneva/bim-ecs';
 import { pointerMoveEvent } from './inputs';
 import { initializeSceneSystem } from './rendering';
 

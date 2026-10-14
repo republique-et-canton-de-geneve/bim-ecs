@@ -1,4 +1,4 @@
-import { defineSystem, EcsPlugin, on, startup, EcsComponent, EcsEvent, EntityId } from 'bim-ecs';
+import { defineSystem, EcsPlugin, on, startup, EcsComponent, EcsEvent, EntityId } from '@state-of-geneva/bim-ecs';
 import { Config } from './config';
 import { BoxGeometry } from './box-geometry';
 import { pointerMoveEvent } from './inputs';

@@ -1,4 +1,4 @@
-import { EcsPlugin, EcsComponent, startup, after, defineSystem, entityRemoved } from 'bim-ecs';
+import { EcsPlugin, EcsComponent, startup, after, defineSystem, entityRemoved } from '@state-of-geneva/bim-ecs';
 import { Config } from './config';
 import { BoxGeometry } from './box-geometry';
 import { initializePlateSystem, Plate, updatePlateSystem } from './plate';

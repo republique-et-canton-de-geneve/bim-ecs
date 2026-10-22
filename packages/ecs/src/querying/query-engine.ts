@@ -88,8 +88,8 @@ export class QueryEngine implements Disposable {
     /** Indexes sets larger than the one to be used as primary source or primary comparator (to be intersected) */
     const largerIndexesEntitySetsResult = fromIndexesEntitySetsResult.filter((set) => set !== smallestIndexedEntitySet);
 
-    // CASE 2: indexed values only
-    if (queryClr.withValue.length && !queryClr.without.size && !queryClr.with.size) {
+    // CASE 2: indexed values only (any archetype level constraint disables this shortcut)
+    if (queryClr.withValue.length && !queryClr.without.size && !queryClr.with.size && !queryClr.anyOf.length) {
       return runQueryFromIndexesOnlyStrategy;
     }
 

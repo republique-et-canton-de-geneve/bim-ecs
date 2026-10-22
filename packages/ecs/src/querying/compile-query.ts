@@ -4,6 +4,7 @@ import { filter } from '@bim-ecs/iterable';
 import { without } from './_builder/without';
 import { withValue } from './_builder/with-value';
 import { withComponent } from './_builder/with-component';
+import { anyOf } from './_builder/any-of';
 import { MODIFIER_RESULT } from './_builder/modifier-result';
 import type { EcsComponent } from '../components';
 
@@ -15,7 +16,12 @@ import type { EcsComponent } from '../components';
 export function compileQueryDefinition(queryDefinition: QueryDefinition) {
   const shell = new QueryClr();
   for (const withItem of filter(
-    queryDefinition({ without: without(shell), withValue: withValue(shell), include: withComponent(shell) }),
+    queryDefinition({
+      without: without(shell),
+      withValue: withValue(shell),
+      include: withComponent(shell),
+      anyOf: anyOf(shell),
+    }),
     (item) => item !== MODIFIER_RESULT,
   )) {
     shell.with.add(withItem as typeof EcsComponent<any>);

@@ -303,11 +303,14 @@ world.entities.spawn(new Animal(), new Name('Foxy'));
 world.query.execute(() => [Component1, Component2]);
 world.query.execute(({ without }) => [Component1, without(Component2)]);
 world.query.execute(({ withValue }) => [Component1, withValue(Component2, 'foo')]);
+world.query.execute(({ anyOf }) => [Component1, anyOf(Component2, Component3)]); // Component1 and (Component2 or Component3)
 ```
 
 ### Query processing details
 
 Queries and entities are preprocessed and categorized by archetype to maximize execution and reduce redundant operations.
+The `with`, `without` and `anyOf` parts of a query are compiled once into bitwise masks and cached on the query, so
+matching an archetype only costs bitwise operations: `without` acts as a _not_ operator and `anyOf` as an _or_ operator.
 
 ## Systems
 

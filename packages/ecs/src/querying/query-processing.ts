@@ -1,7 +1,10 @@
 import { QueryClr } from './_builder/query-clr';
 import type { ArchetypeMask } from './_archetype';
-import { archetypeMaskExcluded, archetypeMaskIncluded } from './_archetype/archetype-mask-operations';
-import { archetypeMaskFor } from './_archetype/archetype-mask-for';
+import {
+  archetypeMaskExcluded,
+  archetypeMaskIncluded,
+  archetypeMaskIntersecting,
+} from './_archetype/archetype-mask-operations';
 import { ComponentTypeIdFlagCounter } from './component-type-id-flag-counter';
 import type { EntityId } from '../entities';
 import { EcsIndexedComponent } from '../components';
@@ -10,21 +13,25 @@ import { TupleMap } from '@bim-ecs/tuple-collections';
 /**
  * Processes query onto archetype mask
  * > 1rst query pass
- * @param queryClr The compiled query ('with' | 'without' parts are processed only)
+ * @param queryClr The compiled query ('with' | 'without' | 'anyOf' parts are processed only)
  * @param mask The tested mask value
  * @param counter The Component type id factory strategy to be used to handle id mask creation
  * @returns true if the mask matches the query, false otherwise
  */
 export function runQueryChunkOnArchetypeMask(
-  queryClr: Pick<QueryClr, 'with' | 'without' | 'withValueComponents'>,
+  queryClr: Pick<QueryClr, 'compiledMasks'>,
   mask: ArchetypeMask,
   counter: ComponentTypeIdFlagCounter,
 ) {
-  return (
-    archetypeMaskIncluded(archetypeMaskFor(queryClr.with, counter), mask) && // "with" processing
-    archetypeMaskIncluded(archetypeMaskFor(queryClr.withValueComponents, counter), mask) && // "withValueComponents" processing
-    archetypeMaskExcluded(archetypeMaskFor(queryClr.without, counter), mask) // "without" processing
-  );
+  const { include, exclude, anyOf } = queryClr.compiledMasks(counter);
+
+  if (!archetypeMaskIncluded(include, mask)) return false; // "with" | "withValueComponents" processing
+  if (!archetypeMaskExcluded(exclude, mask)) return false; // "without" processing ("not" operator)
+  for (let i = 0; i < anyOf.length; i++) {
+    if (!archetypeMaskIntersecting(anyOf[i], mask)) return false; // "anyOf" processing ("or" operator)
+  }
+
+  return true;
 }
 
 /**

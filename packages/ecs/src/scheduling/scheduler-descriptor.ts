@@ -19,6 +19,9 @@ export interface SchedulerDescriptor {
   /** Names of the component types a query excludes */
   without?: string[];
 
+  /** Names of the component types of each "or" group a query requires (at least one component per group) */
+  anyOf?: string[][];
+
   /** Identifiers of the systems the scheduler waits for */
   systems?: number[];
 
@@ -39,6 +42,7 @@ export function describeQuery(kind: string, query: QueryClr): SchedulerDescripto
 
   const descriptor: SchedulerDescriptor = { kind, labels: [...names(query.with), ...names(query.withValueComponents)] };
   if (query.without.size) descriptor.without = names(query.without);
+  if (query.anyOf.length) descriptor.anyOf = query.anyOf.map(names);
 
   return descriptor;
 }

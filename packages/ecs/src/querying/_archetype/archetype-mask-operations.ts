@@ -31,3 +31,18 @@ export function archetypeMaskExcluded(mask1: ArchetypeMask, mask2: ArchetypeMask
 
   return true; // All bits are excluded
 }
+
+/**
+ * Do mask1 and mask2 share at least one bit?
+ * @param mask1 The first mask
+ * @param mask2 The second mask
+ */
+export function archetypeMaskIntersecting(mask1: ArchetypeMask, mask2: ArchetypeMask) {
+  for (let i = 0; i < mask1.length; i++) {
+    if ((mask1[i] & mask2[i]) !== 0) {
+      return true; // At least one bit is shared
+    }
+  }
+
+  return false; // No bit is shared
+}

@@ -4,7 +4,7 @@ import { describe, it, expect } from 'vitest';
 import { QueryEngine } from './query-engine';
 import { EntityPool } from '../entities';
 import { EventBus } from '../event-bus';
-import { EcsComponent, EcsIndexedComponent } from '../components';
+import { EcsComponent, EcsIndexedComponent, ECS_COMPONENT_LINK_REMOVED } from '../components';
 
 describe('QueryEngine', () => {
   describe('execute', () => {
@@ -393,6 +393,107 @@ describe('QueryEngine', () => {
       expect(result).not.includes(spawnedEntities[2]);
       expect(result).not.includes(spawnedEntities[3]);
       expect(result).not.includes(spawnedEntities[4]);
+    });
+  });
+
+  describe('execute after mutations', () => {
+    it('should reflect added components', () => {
+      const bus = new EventBus();
+      const entities = new EntityPool({ bus });
+      const query = new QueryEngine({ bus }, entities);
+
+      class Component1 extends EcsComponent {}
+      class Component2 extends EcsComponent {}
+
+      const entity = entities.spawn(new Component1());
+      expect([...query.execute(() => [Component1, Component2])]).toHaveLength(0);
+
+      entities.addComponent(entity, new Component2());
+
+      expect([...query.execute(() => [Component1, Component2])]).toEqual([entity]);
+    });
+
+    it('should reflect removed components', () => {
+      const bus = new EventBus();
+      const entities = new EntityPool({ bus });
+      const query = new QueryEngine({ bus }, entities);
+
+      class Component1 extends EcsComponent {}
+      class Component2 extends EcsComponent {}
+
+      const entity = entities.spawn(new Component1(), new Component2());
+      expect([...query.execute(() => [Component1, Component2])]).toEqual([entity]);
+
+      entities.removeComponent(entity, Component2);
+
+      expect([...query.execute(() => [Component1, Component2])]).toHaveLength(0);
+      expect([...query.execute(() => [Component1])]).toEqual([entity]);
+      expect([...query.execute(({ without }) => [Component1, without(Component2)])]).toEqual([entity]);
+    });
+
+    it('should not match an indexed value anymore once its component is removed', () => {
+      const bus = new EventBus();
+      const entities = new EntityPool({ bus });
+      const query = new QueryEngine({ bus }, entities);
+
+      class Component2 extends EcsIndexedComponent<string> {}
+
+      const entity = entities.spawn(new Component2('foo'));
+      expect([...query.execute(({ withValue }) => [withValue(Component2, 'foo')])]).toEqual([entity]);
+
+      entities.removeComponent(entity, Component2);
+
+      expect([...query.execute(({ withValue }) => [withValue(Component2, 'foo')])]).toHaveLength(0);
+    });
+
+    it('should provide no result for a value that was never indexed', () => {
+      const bus = new EventBus();
+      const entities = new EntityPool({ bus });
+      const query = new QueryEngine({ bus }, entities);
+
+      class Component2 extends EcsIndexedComponent<string> {}
+
+      entities.spawn(new Component2('foo'));
+
+      expect([...query.execute(({ withValue }) => [withValue(Component2, 'missing')])]).toHaveLength(0);
+    });
+
+    it('should reflect an indexed component value replacement', () => {
+      const bus = new EventBus();
+      const entities = new EntityPool({ bus });
+      const query = new QueryEngine({ bus }, entities);
+
+      class Component2 extends EcsIndexedComponent<string> {}
+
+      const entity = entities.spawn(new Component2('foo'));
+
+      entities.removeComponent(entity, Component2);
+      entities.addComponent(entity, new Component2('bar'));
+
+      expect([...query.execute(({ withValue }) => [withValue(Component2, 'foo')])]).toHaveLength(0);
+      expect([...query.execute(({ withValue }) => [withValue(Component2, 'bar')])]).toEqual([entity]);
+    });
+
+    it('should keep the archetype while another component instance of the same type remains', () => {
+      const bus = new EventBus();
+      const entities = new EntityPool({ bus });
+      const query = new QueryEngine({ bus }, entities);
+
+      class Component1 extends EcsComponent<number> {}
+      class Component2 extends EcsComponent {}
+
+      const entity = entities.spawn(new Component1(0), new Component1(1), new Component2());
+
+      // Cache handlers run before this subscriber: observes the intermediate state after each removal
+      const observedMatches: boolean[] = [];
+      bus.subscribe(ECS_COMPONENT_LINK_REMOVED, () => {
+        observedMatches.push([...query.execute(() => [Component1, Component2])].includes(entity));
+      });
+
+      entities.removeComponent(entity, Component1); // Removes both instances, one event each
+
+      expect(observedMatches).toEqual([true, false]); // Still matching after 1rst removal, excluded after the 2nd one
+      expect([...query.execute(() => [Component2])]).toEqual([entity]);
     });
   });
 

@@ -1,6 +1,6 @@
 import { EcsWorld } from '../../world';
 import { EcsComponent, EcsIndexedComponent } from '../../components';
-import type { EntityId } from '../../entities';
+import type { EntityId, EntityPool } from '../../entities';
 import { TupleMap } from '@bim-ecs/tuple-collections';
 import { ECS_ENTITY_REMOVED, ECS_ENTITY_SPAWNED } from '../../entities/entities-events';
 import { ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED } from '../../components/ecs-component-events';
@@ -11,7 +11,10 @@ export class IndexedComponentsCache implements Disposable {
   /** @internal Stripped from the .d.ts: its `TupleMap` type comes from an embedded (non-published) lib */
   public readonly entitiesByComponentValues = new TupleMap<[typeof EcsIndexedComponent<any>, any], Set<EntityId>>();
 
-  constructor(world: Pick<EcsWorld, 'bus'>) {
+  constructor(
+    world: Pick<EcsWorld, 'bus'>,
+    private readonly entityPool: Pick<EntityPool, 'componentsByEntity'>,
+  ) {
     this.#disposals.push(
       world.bus.subscribe(ECS_ENTITY_SPAWNED, ({ entity, components }) => this.handleAddedEntity(entity, components)),
     );
@@ -19,8 +22,13 @@ export class IndexedComponentsCache implements Disposable {
       world.bus.subscribe(ECS_ENTITY_REMOVED, ({ entity, components }) => this.handleRemovedEntity(entity, components)),
     );
     this.#disposals.push(
-      world.bus.subscribe([ECS_COMPONENT_LINK_ADDED, ECS_COMPONENT_LINK_REMOVED], ({ entity, component }) =>
-        this.handleModifiedEntity(entity, component),
+      world.bus.subscribe(ECS_COMPONENT_LINK_ADDED, ({ entity, component }) =>
+        this.handleComponentLinkAdded(entity, component),
+      ),
+    );
+    this.#disposals.push(
+      world.bus.subscribe(ECS_COMPONENT_LINK_REMOVED, ({ entity, component }) =>
+        this.handleComponentLinkRemoved(entity, component),
       ),
     );
   }
@@ -57,29 +65,37 @@ export class IndexedComponentsCache implements Disposable {
     }
   }
 
-  private handleModifiedEntity(entity: EntityId, component: EcsComponent) {
+  private handleComponentLinkAdded(entity: EntityId, component: EcsComponent) {
     // noinspection SuspiciousTypeOfGuard
     if (!(component instanceof EcsIndexedComponent)) return;
 
     const componentType = component.constructor as typeof EcsIndexedComponent<any>;
-
-    // Remove the entity from the old value set
-    for (const [key, entities] of this.entitiesByComponentValues.entries()) {
-      if (key[0] === componentType && entities.has(entity)) {
-        entities.delete(entity);
-        if (entities.size === 0) {
-          this.entitiesByComponentValues.delete(key);
-        }
-        break;
-      }
-    }
-
-    // Add the entity to the new value set
     const existingEntitySet = this.entitiesByComponentValues.get([componentType, component.value]);
     if (existingEntitySet) {
       existingEntitySet.add(entity);
     } else {
       this.entitiesByComponentValues.set([componentType, component.value], new Set<EntityId>([entity]));
+    }
+  }
+
+  private handleComponentLinkRemoved(entity: EntityId, component: EcsComponent) {
+    // noinspection SuspiciousTypeOfGuard
+    if (!(component instanceof EcsIndexedComponent)) return;
+
+    const componentType = component.constructor as typeof EcsIndexedComponent<any>;
+
+    // Another component instance with the same type and value may remain on the entity: index unchanged
+    for (const remaining of this.entityPool.componentsByEntity.get(entity) ?? []) {
+      if (remaining.constructor === componentType && (remaining as EcsIndexedComponent<any>).value === component.value)
+        return;
+    }
+
+    const existingEntitySet = this.entitiesByComponentValues.get([componentType, component.value]);
+    if (existingEntitySet) {
+      existingEntitySet.delete(entity);
+      if (existingEntitySet.size === 0) {
+        this.entitiesByComponentValues.delete([componentType, component.value]);
+      }
     }
   }
 

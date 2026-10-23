@@ -45,6 +45,48 @@ export class EntitiesFacade implements Partial<EntityPool> {
   }
 
   /**
+   * Adds components to every entity matching the query
+   * @param queryDefinition The query selecting the entities to mutate
+   * @param componentsFactory Produces the component(s) to add for each matched entity
+   * @returns The identifiers of the entities matched by the query
+   */
+  public addComponents(
+    queryDefinition: QueryDefinition,
+    componentsFactory: (entity: EntityId) => EcsComponent<any> | EcsComponent<any>[],
+  ): EntityId[] {
+    // The result is snapshot before mutating: mutations move entities across archetypes
+    // and must not disturb the running query
+    const entities = [...this.querying.execute(queryDefinition)];
+    for (const entity of entities) {
+      const components = componentsFactory(entity);
+      if (Array.isArray(components)) {
+        this.pool.addComponent(entity, ...components);
+      } else {
+        this.pool.addComponent(entity, components);
+      }
+    }
+
+    return entities;
+  }
+
+  /**
+   * Removes component types from every entity matching the query
+   * @param queryDefinition The query selecting the entities to mutate
+   * @param types The component types to remove
+   * @returns The identifiers of the entities matched by the query
+   */
+  public removeComponents(queryDefinition: QueryDefinition, ...types: (typeof EcsComponent<any>)[]): EntityId[] {
+    // The result is snapshot before mutating: mutations move entities across archetypes
+    // and must not disturb the running query
+    const entities = [...this.querying.execute(queryDefinition)];
+    for (const entity of entities) {
+      this.pool.removeComponent(entity, ...types);
+    }
+
+    return entities;
+  }
+
+  /**
    * Describes the entities archetypes for introspection purposes (cold path, never called while processing).
    * The cost is proportional to the number of archetypes, not to the number of entities.
    */

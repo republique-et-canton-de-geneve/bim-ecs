@@ -167,8 +167,11 @@ Systems structure (cf. tooling) :
 **Run the project on local machine :**  
 From the root folder,
 
-- `npm install`
-- `npm run demo:arkanoid`
+- `pnpm install`
+- `pnpm start:demo-arkanoid`
+
+This builds the demo's workspace dependencies (`@state-of-geneva/bim-ecs` and the devtools plugin), then starts the Vite dev server (default: `http://localhost:5173`).  
+Once the libraries are built, you can skip the build step and only start the dev server with `pnpm --filter @bim-ecs/ecs-arkanoid start`.
 
 ## Tooling
 
@@ -222,7 +225,7 @@ const foxyEntity = world.entities.spawn(new Animal(), new NameComponent('Foxy'))
 
 // Microtask delay here
 
-world.entities.remove(foxy);
+world.entities.remove(foxyEntity);
 ```
 
 ### Fetching entity components
@@ -237,7 +240,7 @@ class Name extends EcsComponent<string> {}
 const world = new EcsWorld();
 const person = world.entities.spawn(new Person(), new Name('Bob'));
 
-const components = world.entities.componentsOf(personn);
+const components = world.entities.componentsOf(person);
 const personNameValue = components.get(Name)!.value;
 ```
 
@@ -259,9 +262,49 @@ const foxyEntity = world.entities.spawn(new Animal(), new Name('Foxy'));
 
 // Microtask delay here
 
-world.entities.removeComponentFromEntity(foxyEntity, Animal);
-world.entities.addComponentToEntity(foxyEntity, new Person() /* Instance could also have been eventually reused*/);
+world.entities.removeComponent(foxyEntity, Animal);
+world.entities.addComponent(foxyEntity, new Person() /* Instance could also have been eventually reused*/);
 ```
+
+- `addComponent(entity, ...components)` returns `true` when at least one component has been added (adding the very same instance twice is ignored).
+- `removeComponent(entity, ...types)` removes every component of the given types and returns `true` when at least one component has been removed.
+
+### Updating the composition of multiple entities at once
+
+`addComponents` and `removeComponents` mutate every entity matching a query in a single call. They accept any
+[query definition](#querying), `without` and `anyOf` statements included.
+
+```typescript
+import { EcsWorld, EcsComponent } from '@state-of-geneva/bim-ecs';
+
+class Person extends EcsComponent {}
+class Animal extends EcsComponent {}
+class Citizen extends EcsComponent {}
+class Name extends EcsComponent<string> {}
+
+const world = new EcsWorld();
+
+// Every animal becomes a person (the factory is invoked once per matched entity)
+world.entities.addComponents(
+  () => [Animal],
+  () => new Person(),
+);
+
+// The factory can also provide several components: every unnamed person gets a default name and becomes a citizen
+world.entities.addComponents(
+  ({ without }) => [Person, without(Name)],
+  () => [new Name('Anonymous'), new Citizen()],
+);
+
+// Every person stops being an animal
+const matchedEntities = world.entities.removeComponents(() => [Person], Animal);
+```
+
+- The query is evaluated once, before any mutation, and its result is snapshot. Entities moving across archetypes
+  because of the mutation are never visited twice, and entities starting to match because of it are not visited.
+- Both methods return the identifiers of the entities **matched by the query**, including those on which nothing changed
+  (for instance because they did not hold the removed component types).
+- Since they run a query, they are not available during an [initialization session](#performances-consideration).
 
 ## Components
 
@@ -283,34 +326,93 @@ ECS components inherit `EcsComponent<TValue>` class or derived. There are basica
 
 ### Basics of querying
 
-```typescript
-import { EcsWorld } from './ecs-world';
-import { EcsComponent } from './component';
-import { defineQuery } from './define-query';
+Entities are fetched with `world.entities.query(definition)`. A query definition is a function returning the statements
+the entities must satisfy.
 
-const world = new EcsWorld();
+```typescript
+import { EcsWorld, EcsComponent, EcsIndexedComponent } from '@state-of-geneva/bim-ecs';
 
 // Components
 class Person extends EcsComponent {}
 class Animal extends EcsComponent {}
-class Name extends EcsComponent<string> {}
+class Frozen extends EcsComponent {}
+class Name extends EcsIndexedComponent<string> {}
+
+const world = new EcsWorld();
 
 // Entities
 world.entities.spawn(new Person(), new Name('Bob'));
 world.entities.spawn(new Animal(), new Name('Foxy'));
 
-// New query usage target
-world.query.execute(() => [Component1, Component2]);
-world.query.execute(({ without }) => [Component1, without(Component2)]);
-world.query.execute(({ withValue }) => [Component1, withValue(Component2, 'foo')]);
-world.query.execute(({ anyOf }) => [Component1, anyOf(Component2, Component3)]); // Component1 and (Component2 or Component3)
+// Queries
+world.entities.query(() => [Person, Name]); // Person and Name
+world.entities.query(({ without }) => [Person, without(Frozen)]); // Person and not Frozen
+world.entities.query(({ withValue }) => [Animal, withValue(Name, 'Foxy')]); // Animal and Name with value 'Foxy'
+world.entities.query(({ anyOf }) => [Name, anyOf(Person, Animal)]); // Name and (Person or Animal)
+world.entities.queryOne(() => [Person]); // First match, `undefined` if there is none
 ```
+
+### Query statements
+
+| Statement                            | The entity matches when...                                       |
+| ------------------------------------ | ---------------------------------------------------------------- |
+| `Component` or `include(Component)`  | it holds the component                                           |
+| `without(Component)`                 | it does **not** hold the component (_not_ operator)              |
+| `anyOf(ComponentA, ComponentB, ...)` | it holds **at least one** of the listed components (_or_ operator) |
+| `withValue(IndexedComponent, value)` | it holds the indexed component with this value                   |
+
+- Statements are combined with an _and_. Several `anyOf` statements are all required: `[anyOf(A, B), anyOf(C, D)]`
+  means `(A or B) and (C or D)`.
+- A query made of `without` statements only matches every entity not holding these components.
+- `anyOf` requires at least one component type and applies to component types, not to indexed values. An _or_ between
+  whole conditions (`A and B`, or `C`) is expressed with two queries.
+- `withValue` requires an `EcsIndexedComponent`.
+
+> A query result is a lazy iterable reading live data. Do not add or remove components while iterating it (entities
+> moving across archetypes may be visited more than once): spread the result first (`[...world.entities.query(...)]`) or
+> use the [batch mutation](#updating-the-composition-of-multiple-entities-at-once) methods, which do it for you.
 
 ### Query processing details
 
 Queries and entities are preprocessed and categorized by archetype to maximize execution and reduce redundant operations.
-The `with`, `without` and `anyOf` parts of a query are compiled once into bitwise masks and cached on the query, so
-matching an archetype only costs bitwise operations: `without` acts as a _not_ operator and `anyOf` as an _or_ operator.
+
+1. **Compilation**: a query definition is compiled once. Its component statements become bitwise masks (to include, to
+   exclude, and one per `anyOf` statement) cached on the compiled query, and schedulers filtering on a query compile it
+   once instead of on every event.
+2. **Archetype pass**: every archetype is tested with bitwise operations only (no allocation). Included components must
+   all be part of the archetype (_and_), excluded components must be absent from it (_not_), and each `anyOf` statement
+   must share at least one component with it (_or_).
+3. **Value pass** (`withValue`): the engine crosses archetypes with the value indexes using the cheapest strategy:
+   archetypes only when the query has no `withValue`, indexes only when it has nothing else, otherwise it walks the
+   smaller of both entity sets and probes the other. A value no entity holds ends the query right away with no result.
+
+Archetypes and value indexes are updated incrementally when entities mutate: adding or removing a component flips the
+bits of its type in the entity archetype (the entity moves to the matching archetype) and updates the single value
+index entry concerned. The cost of a mutation only depends on the number of components of the mutated entity, not on the
+number of entities, archetypes or indexed values.
+
+An entity may hold several components of the same type: its archetype (and the value index entry of each value) is kept
+until the last matching component is removed.
+
+### Filtering schedulers with queries
+
+Schedulers filtering on entities accept the same query definitions, `without` and `anyOf` included:
+
+- `spawned(query)` and `entityRemoved(query)`: entities spawned / removed matching the query
+- `componentAdded(Type, query?)` and `componentRemoved(Type, query?)`: a component of this type added to / removed from
+  an entity matching the query. The entity is tested in its state right after the mutation.
+
+```typescript
+import { defineSystem, componentAdded } from '@state-of-geneva/bim-ecs';
+
+defineSystem(
+  'foo',
+  (_, { payload }) => {
+    // payload.entity is a Soldier (not Disarmed) which just received a Weapon
+  },
+  componentAdded(Weapon, ({ without }) => [Soldier, without(Disarmed)]),
+);
+```
 
 ## Systems
 
@@ -580,7 +682,9 @@ world.use(FooPlugin);
 The bim-ecs library is optimized primarily for fast querying. Any read/write/update operation on entity updates some indexes tables to guaranty fast query result as possible, with the cost
 of the indexes tables update.
 
-Components addition/removal is the slowest operation in the library: Prefer spawning entities with the whole component set instead of creating an entity and updating it afterward.
+Components addition/removal updates the entity archetype and the value indexes incrementally: its cost only depends on the number of components of the entity, not on the number of entities. It still costs more than spawning an entity with its whole component set, since each addition or removal moves the entity between archetypes and publishes an event: Prefer spawning entities with the whole component set instead of creating an entity and updating it afterward.
+
+To update a lot of entities sharing some criteria, `addComponents` / `removeComponents` evaluate the query once for all of them (cf. [batch mutation](#updating-the-composition-of-multiple-entities-at-once)).
 
 If for some reason this is not possible (example: Some components could contain some reference to spawned entities -> These reference components should probably be added once entities are spawned),
 an initialization session can be open to reduce entity mutation overhead:
@@ -594,9 +698,9 @@ const world = new EcsWorld()
   // Init session scope
   using _ = world.openInitSession()
 
-  const entity = world.entities.spawn([new MyComponent1('foo')])
+  const entity = world.entities.spawn(new MyComponent1('foo'))
   // [...]
-  world.entities.addComponent(new MyComponent2('bar')) // <- Very fast in this context
+  world.entities.addComponent(entity, new MyComponent2('bar')) // <- Very fast in this context
   
   // End of init session scope
 }
@@ -609,7 +713,7 @@ This `initSession` scope should only be used for entity initialization.
 - Components associations (only for entities added during this scope !)
 
 Some operations are not available during the session and should not be attempted :
-- Querying
+- Querying (including batch mutation with `addComponents` / `removeComponents`, which runs a query)
 - Entity deletion
 
 ## Debugging

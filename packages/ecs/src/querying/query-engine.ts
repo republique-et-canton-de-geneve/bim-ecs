@@ -20,7 +20,7 @@ export class QueryEngine implements Disposable {
     entityPool: EntityPool,
   ) {
     this.archetypeCache = new ArchetypeCache(this.world, entityPool);
-    this.indexedComponentsCache = new IndexedComponentsCache(this.world);
+    this.indexedComponentsCache = new IndexedComponentsCache(this.world, entityPool);
   }
 
   /**
@@ -88,12 +88,13 @@ export class QueryEngine implements Disposable {
     /** Indexes sets larger than the one to be used as primary source or primary comparator (to be intersected) */
     const largerIndexesEntitySetsResult = fromIndexesEntitySetsResult.filter((set) => set !== smallestIndexedEntitySet);
 
+    // No match case: every 'withValue' entry must have indexed entities
+    if (!smallestIndexedEntitySet || fromIndexesEntitySetsResult.some((set) => !set?.size)) return runVoidStrategy;
+
     // CASE 2: indexed values only (any archetype level constraint disables this shortcut)
     if (queryClr.withValue.length && !queryClr.without.size && !queryClr.with.size && !queryClr.anyOf.length) {
       return runQueryFromIndexesOnlyStrategy;
     }
-
-    if (!smallestIndexedEntitySet?.size) return runVoidStrategy; // No match case
 
     /** Masked entity set matching current query */
     const archetypeEntitySet = new Set(

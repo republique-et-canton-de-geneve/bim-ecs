@@ -55,4 +55,79 @@ describe('EntitiesFacade', () => {
       expect(world.entities.archetypes()).toEqual([]);
     });
   });
+
+  describe('addComponents', () => {
+    it('should add a component to every entity matching the query', () => {
+      const world = new EcsWorld();
+      const a = world.entities.spawn(new Position(1));
+      const b = world.entities.spawn(new Position(2), new Name('b'));
+      const c = world.entities.spawn(new Name('c'));
+
+      const mutated = world.entities.addComponents(
+        () => [Position],
+        () => new Velocity(1),
+      );
+
+      expect(mutated.sort()).toEqual([a, b]);
+      expect([...world.entities.query(() => [Position, Velocity])].sort()).toEqual([a, b]);
+      expect([...world.entities.query(() => [Velocity])]).not.toContain(c);
+    });
+
+    it('should invoke the factory once per matched entity', () => {
+      const world = new EcsWorld();
+      world.entities.spawn(new Position(1));
+      world.entities.spawn(new Position(2));
+      world.entities.spawn(new Name('c'));
+
+      const factoryEntities: number[] = [];
+      world.entities.addComponents(
+        () => [Position],
+        (entity) => {
+          factoryEntities.push(entity);
+          return new Velocity(entity);
+        },
+      );
+
+      expect(factoryEntities).toHaveLength(2);
+      expect(new Set(factoryEntities).size).toBe(2); // No entity mutated twice
+    });
+
+    it('should support multiple components per entity', () => {
+      const world = new EcsWorld();
+      const a = world.entities.spawn(new Position(1));
+
+      world.entities.addComponents(
+        () => [Position],
+        () => [new Velocity(1), new Name('a')],
+      );
+
+      expect([...world.entities.query(() => [Position, Velocity, Name])]).toEqual([a]);
+    });
+  });
+
+  describe('removeComponents', () => {
+    it('should remove component types from every entity matching the query', () => {
+      const world = new EcsWorld();
+      const a = world.entities.spawn(new Position(1), new Velocity(1));
+      const b = world.entities.spawn(new Position(2), new Velocity(2), new Name('b'));
+      const c = world.entities.spawn(new Velocity(3));
+
+      const mutated = world.entities.removeComponents(() => [Position, Velocity], Velocity);
+
+      expect(mutated.sort()).toEqual([a, b]);
+      expect([...world.entities.query(() => [Velocity])]).toEqual([c]);
+      expect([...world.entities.query(() => [Position])].sort()).toEqual([a, b]);
+    });
+
+    it('should remove multiple component types at once', () => {
+      const world = new EcsWorld();
+      const a = world.entities.spawn(new Position(1), new Velocity(1), new Name('a'));
+
+      world.entities.removeComponents(() => [Name], Position, Velocity);
+
+      expect([...world.entities.query(() => [Name])]).toEqual([a]);
+      expect([...world.entities.query(() => [Position])]).toHaveLength(0);
+      expect([...world.entities.query(() => [Velocity])]).toHaveLength(0);
+    });
+  });
 });

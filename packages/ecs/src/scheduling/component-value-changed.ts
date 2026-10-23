@@ -24,6 +24,9 @@ export function componentValueChanged<TValue, TComponent extends EcsMutableCompo
     oldValue: TValue;
     newValue: TValue;
   }> {
+    /** The compiled query (compiled once, reused on every event) */
+    readonly #queryClr = query ? compileQueryDefinition(query) : undefined;
+
     #resolveNext:
       | ((value: { component: TComponent; entities: Iterable<EntityId>; oldValue: TValue; newValue: TValue }) => void)
       | null = null;
@@ -56,18 +59,21 @@ export function componentValueChanged<TValue, TComponent extends EcsMutableCompo
           // Component type check
           args.component.constructor !== componentType ||
           // (Optionally) Query check
-          (query &&
+          (this.#queryClr &&
             [...args.entities].every(
               (entity) =>
                 !runAtomicQueryOnSingleEntity(
                   {
                     entity,
-                    componentsMask: archetypeMaskFor(
-                      this.world.entities.componentsOf(entity).keys(),
-                      this.world.entities.querying.archetypeCache.counter,
-                    ),
+                    // The archetype cache is up to date here (subscribed at world construction, before any scheduler)
+                    componentsMask:
+                      this.world.entities.querying.archetypeCache.archetypeMaskByEntity.get(entity) ??
+                      archetypeMaskFor(
+                        this.world.entities.componentsOf(entity).keys(),
+                        this.world.entities.querying.archetypeCache.counter,
+                      ),
                   },
-                  compileQueryDefinition(query),
+                  this.#queryClr!,
                   {
                     counter: this.world.entities.querying.archetypeCache.counter,
                     indexesRepository: this.world.entities.querying.indexedComponentsCache.entitiesByComponentValues,

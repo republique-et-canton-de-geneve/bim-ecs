@@ -19,6 +19,9 @@ export function componentAdded<TValue, TComponent extends EcsComponent<TValue>>(
   query?: QueryDefinition,
 ): SchedulerCtor<{ component: TComponent; entity: EntityId }> {
   return class extends Scheduler<{ component: TComponent; entity: EntityId }> {
+    /** The compiled query (compiled once, reused on every event) */
+    readonly #queryClr = query ? compileQueryDefinition(query) : undefined;
+
     /** @inheritdoc */
     public describe(): SchedulerDescriptor {
       return { kind: 'component-added', labels: [componentType.name] };
@@ -32,16 +35,19 @@ export function componentAdded<TValue, TComponent extends EcsComponent<TValue>>(
           // Component type check
           args.component.constructor !== componentType ||
           // (Optionally) Query check
-          (query &&
+          (this.#queryClr &&
             !runAtomicQueryOnSingleEntity(
               {
                 entity: args.entity,
-                componentsMask: archetypeMaskFor(
-                  this.world.entities.componentsOf(args.entity).keys(),
-                  this.world.entities.querying.archetypeCache.counter,
-                ),
+                // The archetype cache is up to date here (subscribed at world construction, before any scheduler)
+                componentsMask:
+                  this.world.entities.querying.archetypeCache.archetypeMaskByEntity.get(args.entity) ??
+                  archetypeMaskFor(
+                    this.world.entities.componentsOf(args.entity).keys(),
+                    this.world.entities.querying.archetypeCache.counter,
+                  ),
               },
-              compileQueryDefinition(query),
+              this.#queryClr,
               {
                 counter: this.world.entities.querying.archetypeCache.counter,
                 indexesRepository: this.world.entities.querying.indexedComponentsCache.entitiesByComponentValues,

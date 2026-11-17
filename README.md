@@ -736,9 +736,16 @@ If this library is currently used for "État de Genève" BIM project, there are 
 In any case, feel free to create an issue or a pull request if you have any feedback or suggestion about the current implementation.  
 It definitely helps and these will be considered with care !
 
-## NPM publication 
+## NPM publication
 
-- `npm run sync-packages-versions`
-- `npm install`
-- build all
-- `npm publish --workspaces=true`
+The workspace is managed with [pnpm](https://pnpm.io). Three packages are published: `@state-of-geneva/bim-ecs`, `@state-of-geneva/bim-ecs-grouped-component-plugin` and `@state-of-geneva/bim-ecs-devtools-plugin`.  
+All the other workspace packages are private (the `@bim-ecs/iterable` and `@bim-ecs/tuple-collections` libraries are embedded in the `bim-ecs` build).
+
+1. `pnpm version <patch|minor|major|x.y.z>` to bump the `version` field of the root `package.json` (it commits and tags the bump, so the working tree must be clean)
+2. `pnpm sync-packages-versions` to apply it to every workspace package
+3. `pnpm --filter "@state-of-geneva/*..." build` to build the published packages and the workspace packages they depend on
+4. `pnpm run prepublish` to copy the root `README.md` into `packages/ecs` (`pnpm publish -r` does not run the root `prepublish` script)
+5. `pnpm publish -r --dry-run` to preview what will be published, then `pnpm publish -r`
+
+`pnpm publish -r` only publishes the non-private packages whose version is not already on the registry, and replaces the `workspace:*` dependencies by the actual version in the published `package.json`.  
+By default, pnpm also requires a clean working tree on the `main` branch, up to date with its remote (`--no-git-checks` disables these checks).

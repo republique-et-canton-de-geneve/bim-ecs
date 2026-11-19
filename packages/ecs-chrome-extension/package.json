@@ -1,7 +1,7 @@
 {
   "name": "@bim-ecs/chrome-extension",
   "private": true,
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "Chrome DevTools extension inspecting BIM ECS worlds: systems graph, components, entities and resources",
   "type": "module",
   "license": "Apache-2.0",
